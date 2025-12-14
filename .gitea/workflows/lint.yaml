@@ -1,0 +1,66 @@
+name: Lint
+
+on:
+    push:
+        branches:
+            - 'dev'
+    pull_request:
+
+jobs:
+    lint-front:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: '22'
+
+            - name: Install front dependencies
+              run: |
+                  corepack enable
+                  corepack use pnpm@latest
+                  pnpm i
+
+            - name: Run frontend lint
+              run: pnpm lint:front
+
+    lint-backend:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: '1.25'
+
+            - name: Install golangci-lint
+              uses: golangci/golangci-lint-action@v6
+              with:
+                  version: latest
+
+            - name: Run backend lint
+              run: cd backend && golangci-lint run
+
+    lint-worker:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout code
+              uses: actions/checkout@v4
+
+            - name: Set up Go
+              uses: actions/setup-go@v5
+              with:
+                  go-version: '1.25'
+
+            - name: Install golangci-lint
+              uses: golangci/golangci-lint-action@v6
+              with:
+                  version: latest
+
+            - name: Run worker lint
+              run: cd worker && golangci-lint run

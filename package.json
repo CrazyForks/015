@@ -8,7 +8,10 @@
         "dev:front": "cd front && pnpm run dev",
         "dev:backend": "cd backend && air",
         "dev:worker": "cd worker && air",
-        "test": "echo \"Error: no test specified\" && exit 1",
+        "lint": "concurrently -n front,backend,worker -c blue,green,yellow 'pnpm:lint:front' 'pnpm:lint:backend' 'pnpm:lint:worker'",
+        "lint:front": "cd front && pnpm nuxt typecheck",
+        "lint:backend": "cd backend && golangci-lint run",
+        "lint:worker": "cd worker && golangci-lint run",
         "prepare": "husky"
     },
     "workspaces": [
