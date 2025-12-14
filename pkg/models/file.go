@@ -2,7 +2,7 @@ package models
 
 import (
 	"encoding/json"
-	"worker/internal/utils"
+	"pkg/utils"
 
 	"dario.cat/mergo"
 	"github.com/redis/go-redis/v9"
@@ -57,4 +57,9 @@ func SetRedisFileInfo(fileId string, fileInfo RedisFileInfo) error {
 	jsonData, _ := json.Marshal(fileInfo)
 	_, err = rdb.HSet(ctx, "015:fileInfoMap", fileId, string(jsonData)).Result()
 	return err
+}
+
+func GetRedisFileInfoAll() (map[string]string, error) {
+	rdb, ctx := utils.GetRedisClient()
+	return rdb.HGetAll(ctx, "015:fileInfoMap").Result()
 }

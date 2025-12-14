@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/utils"
 	"backend/middleware"
 	"encoding/json"
 	"errors"
+	"pkg/models"
 
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"

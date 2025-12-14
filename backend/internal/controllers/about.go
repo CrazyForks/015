@@ -1,9 +1,9 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/utils"
 	"encoding/json"
+	"pkg/models"
 
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"

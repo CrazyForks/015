@@ -1,11 +1,8 @@
 module backend
 
-go 1.24.0
-
-toolchain go1.24.3
+go 1.25.5
 
 require (
-	dario.cat/mergo v1.0.2
 	github.com/dustin/go-humanize v1.0.1
 	github.com/golang-jwt/jwt/v5 v5.3.0
 	github.com/gorilla/sessions v1.4.0
@@ -13,7 +10,7 @@ require (
 	github.com/labstack/echo-contrib v0.17.4
 	github.com/labstack/echo/v4 v4.13.4
 	github.com/matoous/go-nanoid/v2 v2.1.0
-	github.com/redis/go-redis/v9 v9.14.0
+	github.com/redis/go-redis/v9 v9.17.2
 	github.com/samber/lo v1.51.0
 	github.com/spf13/cast v1.10.0
 	github.com/spf13/viper v1.21.0

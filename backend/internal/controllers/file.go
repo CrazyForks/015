@@ -1,7 +1,6 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/services"
 	"backend/internal/utils"
 	"encoding/json"
@@ -10,6 +9,7 @@ import (
 	"mime/multipart"
 	"os"
 	"path/filepath"
+	"pkg/models"
 	"time"
 
 	"github.com/hibiken/asynq"

@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/utils"
 	"backend/middleware"
 	"encoding/json"
 	"errors"
+	"pkg/models"
 	"strings"
 	"time"
 

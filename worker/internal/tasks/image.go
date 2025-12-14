@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"os/exec"
 	"path/filepath"
-	"worker/internal/models"
+	"pkg/models"
 	"worker/internal/services"
 	"worker/internal/utils"
 

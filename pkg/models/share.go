@@ -1,10 +1,11 @@
 package models
 
 import (
-	"backend/internal/utils"
 	"encoding/json"
 	"fmt"
 	"time"
+
+	"pkg/utils"
 
 	"dario.cat/mergo"
 	"github.com/redis/go-redis/v9"

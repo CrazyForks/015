@@ -1,8 +1,8 @@
 package models
 
 import (
-	"backend/internal/utils"
 	"encoding/json"
+	"pkg/utils"
 
 	"github.com/redis/go-redis/v9"
 )

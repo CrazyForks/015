@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"worker/internal/models"
+	"pkg/models"
 	"worker/internal/utils"
 
 	"github.com/hibiken/asynq"

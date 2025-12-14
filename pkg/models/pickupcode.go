@@ -1,9 +1,10 @@
 package models
 
 import (
-	"backend/internal/utils"
 	"fmt"
 	"time"
+
+	"pkg/utils"
 
 	"github.com/redis/go-redis/v9"
 )

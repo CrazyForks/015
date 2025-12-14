@@ -1,11 +1,11 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/utils"
 	"backend/middleware"
 	"errors"
 	"fmt"
+	"pkg/models"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
