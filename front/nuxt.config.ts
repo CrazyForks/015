@@ -27,7 +27,6 @@ export default defineNuxtConfig({
         ],
     },
     vite: {
-        transformMixedEsModules: true,
         plugins: [tailwindcss()],
         optimizeDeps: {
             include: ['eventemitter3'],
