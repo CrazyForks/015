@@ -436,7 +436,7 @@ const handleShowSpeedInfo = () => {
                     :class="
                         cx(
                             'grid grid-cols-[2fr_6rem_6rem] md:grid-cols-[2fr_6rem_6rem_4fr] gap-2 py-2 border-b border-black/20 items-center hover:bg-primary/30 px-3 cursor-pointer',
-                            selectedFile === item?.fileId && 'bg-primary text-white hover:!bg-primary'
+                            selectedFile === item?.fileId && 'bg-primary text-white hover:bg-primary!'
                         )
                     "
                     v-for="(item, index) in uploadfiles"

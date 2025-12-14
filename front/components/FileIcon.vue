@@ -32,7 +32,7 @@ const fileIcon = computed(() => {
     if (baseType === 'audio') {
         return LucideFileAudio
     }
-    if (baseType === 'text' || ['json', 'ld+json', 'html']?.includes(type)) {
+    if (baseType === 'text' || ['json', 'ld+json', 'html']?.includes(type ?? '')) {
         return LucideFileCode
     }
     if (
@@ -44,11 +44,11 @@ const fileIcon = computed(() => {
             'vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             'vnd.ms-powerpoint',
             'vnd.openxmlformats-officedocument.presentationml.presentation',
-        ].includes(type)
+        ].includes(type ?? '')
     ) {
         return LucideFileText
     }
-    if (['zip', 'vnd.rar', 'x-tar', 'gz', 'bz2', 'x-7z-compressed'].includes(type)) {
+    if (['zip', 'vnd.rar', 'x-tar', 'gz', 'bz2', 'x-7z-compressed'].includes(type ?? '')) {
         return LucideFileArchive
     }
     return LucideFile

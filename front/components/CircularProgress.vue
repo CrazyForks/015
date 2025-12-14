@@ -1,19 +1,21 @@
 <script lang="ts" setup>
 import { VisSingleContainer, VisDonut } from '@unovis/vue'
-import { withDefaults, defineProps } from 'vue'
 
-const props = withDefaults(defineProps<{
-    value?: number
-    size?: number
-    color?: string
-}>(), {
-    value: 0,
-    size: 40,
-    color: '#06b6d4'
-})
+const props = withDefaults(
+    defineProps<{
+        value?: number
+        size?: number
+        color?: string
+    }>(),
+    {
+        value: 0,
+        size: 40,
+        color: '#06b6d4',
+    }
+)
 const data = computed(() => {
     const progress = Math.min(Math.max(props.value, 0), 100)
-    return [progress, 100 - progress ]
+    return [progress, 100 - progress]
 })
 const getValue = (d: number) => d
 const getColor = (d: number, i: number) => [props?.color, 'transparent'][i]
