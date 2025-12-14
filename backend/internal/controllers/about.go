@@ -4,13 +4,14 @@ import (
 	"backend/internal/utils"
 	"encoding/json"
 	"pkg/models"
+	u "pkg/utils"
 
 	"github.com/labstack/echo/v4"
 	"github.com/samber/lo"
 )
 
 func GetAbout(c echo.Context) error {
-	maxStorageSize, err := utils.GetFileSize(utils.GetEnv("upload.maximum"))
+	maxStorageSize, err := utils.GetFileSize(u.GetEnv("upload.maximum"))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -30,12 +31,12 @@ func GetAbout(c echo.Context) error {
 	}, 0)
 
 	return utils.HTTPSuccessHandler(c, map[string]any{
-		"bg_url":  utils.GetEnv("about.bg_url"),
-		"content": utils.GetEnvMapString("about.content"),
-		"email":   utils.GetEnv("about.email"),
-		"name":    utils.GetEnv("about.name"),
-		"url":     utils.GetEnv("about.url"),
-		"avatar":  utils.GetEnv("about.avatar"),
+		"bg_url":  u.GetEnv("about.bg_url"),
+		"content": u.GetEnvMapString("about.content"),
+		"email":   u.GetEnv("about.email"),
+		"name":    u.GetEnv("about.name"),
+		"url":     u.GetEnv("about.url"),
+		"avatar":  u.GetEnv("about.avatar"),
 		"file": map[string]any{
 			"maximun": maxStorageSize,
 			"current": currentFileSize,

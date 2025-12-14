@@ -4,6 +4,7 @@ import (
 	"backend/internal/utils"
 	"encoding/json"
 	"pkg/models"
+	u "pkg/utils"
 
 	"github.com/labstack/echo/v4"
 )
@@ -47,7 +48,7 @@ func GetStat(c echo.Context) error {
 		}
 	}
 
-	queueInspector := utils.GetQueueInspector()
+	queueInspector := u.GetQueueInspector()
 	queues, err := queueInspector.History("default", QueueHistoryDays)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)

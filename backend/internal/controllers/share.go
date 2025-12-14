@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"errors"
 	"pkg/models"
+	u "pkg/utils"
 	"strings"
 	"time"
 
@@ -107,13 +108,13 @@ func CreateShareInfo(c echo.Context) error {
 		}
 		shareIDs = append(shareIDs, id)
 		models.SetRedisFileShareRelational(r.Data, shareIDs)
-		client := utils.GetQueueClient()
+		client := u.GetQueueClient()
 		json, err := json.Marshal(map[string]any{"share_id": id, "file_id": r.Data})
 		if err != nil {
 			return utils.HTTPErrorHandler(c, err)
 		}
 		// 这里延时分享过期时间基础上加下载窗口期后1小时删除，防止用户过期前几分钟才开始下载，下载一半文件不见了
-		downloadWindow := utils.GetEnvWithDefault("share.download_window", "12")
+		downloadWindow := u.GetEnvWithDefault("share.download_window", "12")
 		deleteTime := time.Duration(r.Config.ExpireAt)*time.Minute + cast.ToDuration(downloadWindow+"h") + 1*time.Hour
 		_, err = client.Enqueue(asynq.NewTask("share:remove", json), asynq.ProcessIn(deleteTime))
 		if err != nil {

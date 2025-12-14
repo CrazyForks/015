@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"pkg/models"
+	u "pkg/utils"
 	"time"
 
 	"github.com/hibiken/asynq"
@@ -40,7 +41,7 @@ func CreateUploadTask(c echo.Context) error {
 			"chunk_size": fileInfo.ChunkSize,
 		})
 	}
-	maxStorageSize, err := utils.GetFileSize(utils.GetEnv("upload.maximum"))
+	maxStorageSize, err := utils.GetFileSize(u.GetEnv("upload.maximum"))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -83,7 +84,7 @@ func CreateUploadTask(c echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	client := utils.GetQueueClient()
+	client := u.GetQueueClient()
 	json, err := json.Marshal(map[string]any{
 		"file_id": fileId,
 	})

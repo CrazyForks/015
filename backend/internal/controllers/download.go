@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"pkg/models"
+	u "pkg/utils"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -26,7 +27,7 @@ func DownloadShare(c echo.Context) error {
 	}
 	claims := DownloadShareClaims{}
 	t, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
-		return []byte(utils.GetEnv("share.download_secret")), nil
+		return []byte(u.GetEnv("share.download_secret")), nil
 	})
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
@@ -89,7 +90,7 @@ func VaildateShare(c echo.Context) error {
 	if shareInfo.ViewNum < 1 {
 		return utils.HTTPErrorHandler(c, errors.New("下载次数不足"))
 	}
-	downloadWindow := utils.GetEnvWithDefault("share.download_window", "12")
+	downloadWindow := u.GetEnvWithDefault("share.download_window", "12")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, DownloadShareClaims{
 		ShareId: r.ShareId,
 		RegisteredClaims: jwt.RegisteredClaims{
@@ -98,7 +99,7 @@ func VaildateShare(c echo.Context) error {
 	})
 
 	// Sign and get the complete encoded token as a string using the secret
-	downloadToken, err := token.SignedString([]byte(utils.GetEnv("share.download_secret")))
+	downloadToken, err := token.SignedString([]byte(u.GetEnv("share.download_secret")))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}

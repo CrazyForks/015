@@ -3,12 +3,13 @@ package utils
 import (
 	"errors"
 	"fmt"
+	"pkg/utils"
 
 	"golang.org/x/crypto/argon2"
 )
 
 func GeneratePasswordHash(password string) (string, error) {
-	salt := GetEnv("share.password_salt")
+	salt := utils.GetEnv("share.password_salt")
 	if salt == "" {
 		return "", errors.New("请配置PASSWORD_SALT")
 	}

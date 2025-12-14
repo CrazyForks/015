@@ -7,6 +7,8 @@ import (
 	"errors"
 	"pkg/models"
 
+	u "pkg/utils"
+
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 )
@@ -25,7 +27,7 @@ func GenCompressImage(c echo.Context) error {
 	if r.FileId == "" {
 		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
 	}
-	client := utils.GetQueueClient()
+	client := u.GetQueueClient()
 	json, err := json.Marshal(map[string]any{
 		"file_id": r.FileId,
 	})
@@ -54,7 +56,7 @@ func GetCompressImage(c echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if taskInfo == nil {
-		client := utils.GetQueueInspector()
+		client := u.GetQueueInspector()
 
 		queneTaskInfo, err := client.GetTaskInfo("default", taskId)
 		if err != nil {
