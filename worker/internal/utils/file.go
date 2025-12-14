@@ -7,6 +7,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"pkg/utils"
 )
 
 func GetFileId(fileHash string, fileSize int64) string {
@@ -39,7 +40,7 @@ func GetUploadDirPath() (string, error) {
 		return "", err
 	}
 	finalPath := filepath.Join(basepath, "uploads")
-	uploadPath := GetEnvWithDefault("upload.path", finalPath)
+	uploadPath := utils.GetEnvWithDefault("upload.path", finalPath)
 	if err := os.MkdirAll(uploadPath, 0755); err != nil {
 		return "", err
 	}

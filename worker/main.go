@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
+	"pkg/utils"
 	"worker/internal/tasks"
-	"worker/internal/utils"
 	"worker/middleware"
 
 	"github.com/hibiken/asynq"

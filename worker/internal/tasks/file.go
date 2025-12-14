@@ -6,6 +6,7 @@ import (
 	"os"
 	"path/filepath"
 	"pkg/models"
+	u "pkg/utils"
 	"worker/internal/utils"
 
 	"github.com/hibiken/asynq"
@@ -29,7 +30,7 @@ func RemoveFile(ctx context.Context, task *asynq.Task) error {
 		return nil
 	}
 
-	rdb, rctx := utils.GetRedisClient()
+	rdb, rctx := u.GetRedisClient()
 	uploadPath, err := utils.GetUploadDirPath()
 	if err != nil {
 		return err
