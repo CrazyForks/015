@@ -28,6 +28,6 @@ var routes = []Route{
 	{Method: []string{"GET"}, Path: "/config", Handler: controllers.GetConfig},
 	{Method: []string{"GET"}, Path: "/about", Handler: controllers.GetAbout},
 
-	{Method: []string{"POST"}, Path: "/image/compress", Handler: controllers.GenCompressImage},
-	{Method: []string{"GET"}, Path: "/image/compress/:id", Handler: controllers.GetCompressImage},
+	{Method: []string{"POST"}, Path: "/task/:type", Handler: controllers.CreateTask},
+	{Method: []string{"GET"}, Path: "/task/:id", Handler: controllers.GetTask},
 }

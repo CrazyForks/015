@@ -1,40 +1,39 @@
 package controllers
 
 import (
+	"backend/internal/controllers/task"
 	"backend/internal/utils"
 	"backend/middleware"
-	"encoding/json"
 	"errors"
 	"pkg/models"
-
 	u "pkg/utils"
 
 	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v4"
 )
 
-type GenCompressImageRequest struct {
-	FileId string `json:"file_id"`
+var handleTaskMap = map[string]func(c *middleware.CustomContext) ([]byte, error){
+	"image:compress": task.HandleImageCompress,
 }
 
-func GenCompressImage(c echo.Context) error {
+func CreateTask(c echo.Context) error {
 	cc := c.(*middleware.CustomContext)
-	r := new(GenCompressImageRequest)
-	if err := cc.Bind(r); err != nil {
-		return utils.HTTPErrorHandler(c, err)
-	}
 
-	if r.FileId == "" {
+	taskType := cc.Param("type")
+	if taskType == "" {
 		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
 	}
-	client := u.GetQueueClient()
-	json, err := json.Marshal(map[string]any{
-		"file_id": r.FileId,
-	})
+	handleTask, ok := handleTaskMap[taskType]
+	if !ok {
+		return utils.HTTPErrorHandler(c, errors.New("任务不存在"))
+	}
+	json, err := handleTask(cc)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
-	info, err := client.Enqueue(asynq.NewTask("image:compress", json), asynq.MaxRetry(3))
+
+	client := u.GetQueueClient()
+	info, err := client.Enqueue(asynq.NewTask(taskType, json), asynq.MaxRetry(3))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -44,7 +43,7 @@ func GenCompressImage(c echo.Context) error {
 	})
 }
 
-func GetCompressImage(c echo.Context) error {
+func GetTask(c echo.Context) error {
 	cc := c.(*middleware.CustomContext)
 	taskId := cc.Param("id")
 	if taskId == "" {
