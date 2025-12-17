@@ -1,66 +1,74 @@
 <script setup lang="ts">
-import { useQuery } from '@tanstack/vue-query'
+import { useQueries, useQuery } from '@tanstack/vue-query'
 import { AsyncButton, Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { filesize } from 'filesize'
 import useMyAppShare from '@/composables/useMyAppShare'
 import { toast } from 'vue-sonner'
+import type { handleFileComponentProps } from './types'
 const emit = defineEmits<{
     (e: 'change', key: string): void
 }>()
-const props = defineProps<{
-    data: { file: File; config: any; handle_type: string; file_id: string }
-}>()
-
-const { data } = useQuery({
-    queryKey: ['create-image-compress', props?.data?.file_id],
+const props = defineProps<handleFileComponentProps>()
+const fileIds = computed(() => props?.data?.files?.map((item) => item.id))
+const { data: taskIds } = useQuery({
+    queryKey: ['create-image-compress', fileIds.value],
     queryFn: async () => {
-        const { file_id } = props?.data || {}
-        const data = await $fetch<{
-            code: number
-            data: {
-                id?: string
-            }
-        }>(`/api/image/compress`, {
-            method: 'POST',
-            body: {
-                file_id,
-            },
-        })
-        return data?.data
+        return await Promise.all(
+            props?.data?.files?.map(async (file) => {
+                const { id } = file || {}
+                if (!id) return
+                const data = await $fetch<{
+                    code: number
+                    data: {
+                        id?: string
+                    }
+                }>(`/api/task/image:compress`, {
+                    method: 'POST',
+                    body: {
+                        file_id: id,
+                    },
+                })
+                return data?.data?.id
+            })
+        )
     },
     staleTime: Infinity,
+    enabled: !!fileIds.value && fileIds.value?.length > 0,
 })
 
-const taskId = computed(() => data?.value?.id)
-
-const { data: taskData, refetch } = useQuery({
-    queryKey: ['image-compress-task', taskId],
-    queryFn: async () => {
-        const data = await $fetch<{
-            code: number
-            data: {
-                result: {
-                    old_file: {
-                        id: string
-                        size: number
-                    }
-                    new_file: {
-                        id: string
-                        size: number
-                    }
-                }[]
-                status: 'success' | 'retry' | 'archived'
-                err?: {
-                    message?: string
-                    retry?: number
-                    max_retry?: number
-                }
+const taskResults = useQueries({
+    queries:
+        taskIds?.value?.filter(Boolean).map((taskId) => {
+            return {
+                queryKey: ['task-image-compress', taskId],
+                queryFn: async () => {
+                    const data = await $fetch<{
+                        code: number
+                        data: {
+                            result: {
+                                old_file: {
+                                    id: string
+                                    size: number
+                                }
+                                new_file: {
+                                    id: string
+                                    size: number
+                                }
+                            }[]
+                            status: 'success' | 'retry' | 'archived'
+                            err?: {
+                                message?: string
+                                retry?: number
+                                max_retry?: number
+                            }
+                        }
+                    }>(`/api/task/${taskId}`)
+                    return data?.data
+                },
+                enabled: !!taskId,
             }
-        }>(`/api/image/compress/${taskId.value}`)
-        return data?.data
-    },
-    enabled: !!taskId.value,
+        }) ?? [],
 })
 
 const { downloadFileByShareId, createFileShare } = useMyAppShare()
@@ -70,23 +78,24 @@ const { counter, pause } = useInterval(2000, { controls: true })
 watch(
     () => counter.value,
     () => {
-        if (['success', 'archived'].includes(taskData.value?.status ?? '')) {
-            pause()
-            return
-        }
-        refetch()
+        taskResults.value.forEach((item) => {
+            if (['success', 'archived'].includes(item.data?.status ?? '')) {
+                pause()
+                return
+            }
+            item.refetch()
+        })
     }
 )
 
 watch(
-    () => taskData.value?.err?.retry,
+    () => taskResults.value,
     (newVal, oldVal) => {
-        if (!oldVal || !newVal || !taskData.value?.err?.max_retry) {
-            return
-        }
-        if (newVal <= taskData.value?.err?.max_retry) {
-            toast.error(`处理错误: ${taskData.value?.err?.message}, 将再次重试`)
-        }
+        newVal?.map((item, index) => {
+            const { retry, max_retry, message } = item.data?.err || {}
+            if (!retry || !max_retry || retry >= max_retry || retry === oldVal?.[index]?.data?.err?.retry) return
+            toast.error(`处理错误: ${message}, 将再次重试`)
+        })
     }
 )
 </script>
