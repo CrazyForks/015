@@ -10,11 +10,9 @@ import showDrawer from '@/lib/showDrawer'
 import QrCoreDrawer from '@/components/Drawer/QrCoreDrawer.vue'
 import dayjs from 'dayjs'
 import { h } from 'vue'
-import type { TextHandleKey } from '../Preprocessing/types'
+import type { handleTextComponentProps } from './types'
 
-const props = defineProps<{
-    data: { text: string; config: Record<string, any>; handle_type: TextHandleKey }
-}>()
+const props = defineProps<handleTextComponentProps>()
 
 const emit = defineEmits<{
     (e: 'change', key: string): void

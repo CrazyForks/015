@@ -12,11 +12,9 @@ import showDrawer from '@/lib/showDrawer'
 import QrCoreDrawer from '@/components/Drawer/QrCoreDrawer.vue'
 import { h } from 'vue'
 import { cx } from 'class-variance-authority'
-import type { FileHandleKey } from '../Preprocessing/types'
+import type { handleFileComponentProps } from './types'
 
-const props = defineProps<{
-    data: { files: { id: string; file: File }[]; config: Record<string, any>; handle_type: FileHandleKey }
-}>()
+const props = defineProps<handleFileComponentProps>()
 const emit = defineEmits<{
     (e: 'change', key: string): void
 }>()
