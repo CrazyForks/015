@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { useQueries, useQuery } from '@tanstack/vue-query'
-import { AsyncButton, Button } from '@/components/ui/button'
+import { AsyncButton } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { filesize } from 'filesize'
 import useMyAppShare from '@/composables/useMyAppShare'
 import { toast } from 'vue-sonner'
 import type { handleFileComponentProps } from './types'
+import { get } from 'lodash-es'
 const emit = defineEmits<{
     (e: 'change', key: string): void
 }>()
@@ -38,37 +39,52 @@ const { data: taskIds } = useQuery({
 })
 
 const taskResults = useQueries({
-    queries:
-        taskIds?.value?.filter(Boolean).map((taskId) => {
-            return {
-                queryKey: ['task-image-compress', taskId],
-                queryFn: async () => {
-                    const data = await $fetch<{
-                        code: number
-                        data: {
-                            result: {
-                                old_file: {
-                                    id: string
-                                    size: number
+    queries: computed(
+        () =>
+            taskIds?.value?.filter(Boolean).map((taskId) => {
+                return {
+                    queryKey: ['task-image-compress', taskId],
+                    queryFn: async () => {
+                        const data = await $fetch<{
+                            code: number
+                            data: {
+                                result: {
+                                    old_file: {
+                                        id: string
+                                        size: number
+                                    }
+                                    new_file: {
+                                        id: string
+                                        size: number
+                                    }
+                                }[]
+                                status: 'success' | 'retry' | 'archived'
+                                err?: {
+                                    message?: string
+                                    retry?: number
+                                    max_retry?: number
                                 }
-                                new_file: {
-                                    id: string
-                                    size: number
-                                }
-                            }[]
-                            status: 'success' | 'retry' | 'archived'
-                            err?: {
-                                message?: string
-                                retry?: number
-                                max_retry?: number
                             }
-                        }
-                    }>(`/api/task/${taskId}`)
-                    return data?.data
-                },
-                enabled: !!taskId,
+                        }>(`/api/task/${taskId}`)
+                        return data?.data
+                    },
+                    enabled: !!taskId,
+                }
+            }) ?? []
+    ),
+})
+
+const totalSize = computed(() => {
+    return taskResults.value.reduce(
+        (acc, item) => {
+            const { new_file, old_file } = get(item, 'data.result.0') || {}
+            return {
+                oldSize: acc.oldSize + (old_file?.size ?? 0),
+                newSize: acc.newSize + (new_file?.size ?? 0),
             }
-        }) ?? [],
+        },
+        { oldSize: 0, newSize: 0 }
+    )
 })
 
 const { downloadFileByShareId, createFileShare } = useMyAppShare()
@@ -79,66 +95,88 @@ watch(
     () => counter.value,
     () => {
         taskResults.value.forEach((item) => {
-            if (['success', 'archived'].includes(item.data?.status ?? '')) {
-                pause()
-                return
-            }
+            if (['success', 'archived'].includes(item.data?.status ?? '')) return
             item.refetch()
         })
-    }
-)
 
-watch(
-    () => taskResults.value,
-    (newVal, oldVal) => {
-        newVal?.map((item, index) => {
-            const { retry, max_retry, message } = item.data?.err || {}
-            if (!retry || !max_retry || retry >= max_retry || retry === oldVal?.[index]?.data?.err?.retry) return
-            toast.error(`处理错误: ${message}, 将再次重试`)
-        })
+        if (taskResults.value.every((item) => ['success', 'archived'].includes(item.data?.status ?? ''))) {
+            pause()
+        }
     }
 )
 </script>
 <template>
     <div class="flex flex-col gap-3">
-        <h2 class="text-lg">上传成功</h2>
-        <div class="flex flex-col gap-1 items-center">
-            <div class="flex flex-col h-30 items-center justify-center">
-                <FilePreviewView :value="props?.data?.file" />
-            </div>
-        </div>
-        <div v-if="taskData?.status === 'success'" class="flex flex-col gap-2" v-for="item in taskData?.result">
-            <div class="bg-white/80 p-2 rounded-md w-full flex flex-row items-center justify-between gap-2">
-                <div class="flex flex-row gap-2 items-center max-w-2/3">
-                    <div class="flex flex-row items-center justify-center rounded-md bg-black/5 p-2">
-                        <LucideImage />
-                    </div>
-                    <div class="truncate w-auto">{{ props?.data?.file?.name }}</div>
-                    <div class="flex flex-row gap-2 items-center text-sm shrink-0">
-                        <span class="opacity-75">{{ filesize(item.new_file.size ?? 0) }}</span>
-                        <span class="bg-green-200 text-green-600 rounded-md px-1 py-0.5 flex flex-row gap-1 items-center text-xs">
-                            <LucideChevronDown class="size-4" />
-                            {{ ((1 - item.new_file.size / item.old_file.size) * 100).toFixed(2) }}%
-                        </span>
+        <h2 class="text-lg">图片压缩</h2>
+        <div class="flex flex-row gap-3">
+            <div class="rounded-xl flex flex-col bg-white/70 px-3 py-2 gap-1 basis-2/3">
+                <div class="text-sm font-semibold">总大小</div>
+                <div class="text-2xl font-light flex flex-row items-center gap-1">
+                    <span class="opacity-75">{{ filesize(totalSize.oldSize) }}</span>
+                    <LucideChevronsRight class="size-6" />
+                    <span>{{ filesize(totalSize.newSize) }}</span>
+                    <div class="rounded flex flex-row items-center bg-green-100 text-green-600 p-1 py-0.5 text-sm">
+                        <LucideArrowDown class="size-4" />
+                        {{ ((1 - totalSize.newSize / totalSize.oldSize) * 100).toFixed(2) }}%
                     </div>
                 </div>
+            </div>
+            <div class="rounded-xl flex flex-col bg-white/70 px-3 py-2 gap-1 basis-1/3">
+                <div class="text-sm font-semibold">任务</div>
+                <div class="text-3xl font-light">{{ taskResults.length }}</div>
+            </div>
+        </div>
+        <div v-for="(item, index) in props?.data?.files" class="flex flex-row rounded-xl bg-white/70 p-3 justify-between">
+            <div class="flex flex-row gap-2 items-center">
+                <div class="*:h-12 overflow-hidden">
+                    <FileIcon :file="item?.file" />
+                </div>
+                <div class="flex flex-col gap-0.5">
+                    <div class="truncate w-auto">{{ item?.file?.name }}</div>
+                    <div class="text-xs opacity-50">{{ filesize(item?.file?.size ?? 0) }}</div>
+                </div>
+            </div>
+            <div class="flex items-center justify-center" v-if="!taskResults?.[index]?.data">
+                <Skeleton class="w-16 h-12" />
+            </div>
+            <div class="flex flex-row gap-1 items-center text-sm" v-if="taskResults?.[index]?.data?.status === 'retry'">
+                <LucideLoader2 class="size-4 animate-spin" />
+                重试 {{ taskResults?.[index]?.data?.err?.retry || 0 }}/{{ taskResults?.[index]?.data?.err?.max_retry || 0 }}
+            </div>
+            <div class="flex items-center justify-center" v-if="taskResults?.[index]?.data?.status === 'archived'">
+                <div class="text-sm text-red-500 px-2 py-1 rounded-md bg-red-100">失败</div>
+            </div>
+            <div class="flex flex-row gap-2 items-center" v-if="taskResults?.[index]?.data?.status === 'success'">
+                <div class="flex flex-col gap-1 items-center">
+                    <div class="rounded flex flex-row items-center bg-green-100 text-green-600 px-1 text-xs">
+                        <LucideArrowDown class="size-4" />
+                        {{
+                            (
+                                (1 -
+                                    (taskResults?.[index]?.data?.result?.[0]?.new_file?.size ?? 0) /
+                                        (taskResults?.[index]?.data?.result?.[0]?.old_file?.size ?? 0)) *
+                                100
+                            ).toFixed(2)
+                        }}%
+                    </div>
+                    <div class="text-xs opacity-50">{{ filesize(taskResults?.[index]?.data?.result?.[0]?.new_file?.size ?? 0) }}</div>
+                </div>
                 <AsyncButton
-                    variant="outline"
-                    class="bg-black/5"
                     size="icon"
                     @click="
                         async () => {
+                            const { new_file } = taskResults?.[index]?.data?.result?.[0] || {}
+                            if (!new_file?.id) return
                             const data = await createFileShare({
-                                file_id: item.new_file.id,
+                                files: [{ id: new_file?.id as string, name: item?.file?.name }],
                                 config: {
                                     download_nums: 1,
                                     expire_time: 60,
                                     has_pickup_code: false,
                                     has_password: false,
                                 },
-                                file_name: props?.data?.file?.name,
                             })
-                            const { id } = data?.data || {}
+                            const { id } = data?.[0]?.data || {}
                             if (!id) {
                                 return
                             }
@@ -149,27 +187,9 @@ watch(
                             }
                         }
                     "
-                >
-                    <LucideDownload />
-                </AsyncButton>
+                    ><LucideArrowDown
+                /></AsyncButton>
             </div>
-        </div>
-        <div v-else-if="taskData?.status !== 'retry' && !!taskData?.err?.message" class="flex flex-col gap-2">
-            <div class="w-full h-16 flex flex-row items-center gap-3 bg-white/80 rounded-md p-2">
-                <div class="size-10 flex items-center justify-center rounded-md bg-red-200">
-                    <LucideAlertTriangle class="size-5 text-red-600" />
-                </div>
-                <div class="text-sm">
-                    {{ `经过 ${taskData?.err?.retry} 次重试后任务处理失败: ${taskData?.err?.message}` }}
-                </div>
-            </div>
-            <div class="flex flex-row justify-center">
-                <Button @click="emit('change', 'input')"> 返回首页 </Button>
-            </div>
-        </div>
-
-        <div v-else="taskData?.status !== 'retry' && !!taskData?.err?.message" class="flex flex-col gap-2">
-            <Skeleton class="w-full h-16 flex flex-row items-center justify-between" v-for="i in 3" />
         </div>
     </div>
 </template>
