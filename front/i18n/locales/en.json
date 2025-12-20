@@ -46,11 +46,7 @@
         "passwordPlaceholder": "Enter password",
         "emailPlaceholder": "Enter email",
         "downloadOptions": {
-            "1time": "1 download",
-            "2times": "2 downloads",
-            "3times": "3 downloads",
-            "5times": "5 downloads",
-            "10times": "10 downloads"
+            "xdownload": "{0} downloads"
         },
         "expireOptions": {
             "5min": "5 minutes",
@@ -71,11 +67,7 @@
         "passwordPlaceholder": "Enter password",
         "emailPlaceholder": "Enter email",
         "viewOptions": {
-            "1time": "1 view",
-            "2times": "2 views",
-            "3times": "3 views",
-            "5times": "5 views",
-            "10times": "10 views"
+            "xview": "{0} views"
         },
         "expireOptions": {
             "5min": "5 minutes",

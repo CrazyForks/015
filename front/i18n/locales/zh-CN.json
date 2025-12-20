@@ -46,11 +46,7 @@
         "passwordPlaceholder": "请输入密码",
         "emailPlaceholder": "请输入邮箱",
         "downloadOptions": {
-            "1time": "1次下载",
-            "2times": "2次下载",
-            "3times": "3次下载",
-            "5times": "5次下载",
-            "10times": "10次下载"
+            "xdownload": "{0}次下载"
         },
         "expireOptions": {
             "5min": "5分钟",
@@ -71,11 +67,7 @@
         "passwordPlaceholder": "请输入密码",
         "emailPlaceholder": "请输入邮箱",
         "viewOptions": {
-            "1time": "1次浏览",
-            "2times": "2次浏览",
-            "3times": "3次浏览",
-            "5times": "5次浏览",
-            "10times": "10次浏览"
+            "xview": "{0}次浏览"
         },
         "expireOptions": {
             "5min": "5分钟",

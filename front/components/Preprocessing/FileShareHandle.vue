@@ -21,11 +21,11 @@ const props = defineProps<{
                     name="download_nums"
                     :label="t('fileshare.downloadNums')"
                     :options="[
-                        { label: t('fileshare.downloadOptions.1time'), value: 1 },
-                        { label: t('fileshare.downloadOptions.2times'), value: 2 },
-                        { label: t('fileshare.downloadOptions.3times'), value: 3 },
-                        { label: t('fileshare.downloadOptions.5times'), value: 5 },
-                        { label: t('fileshare.downloadOptions.10times'), value: 10 },
+                        { label: t('fileshare.downloadOptions.xdownload', 1), value: 1 },
+                        { label: t('fileshare.downloadOptions.xdownload', 2), value: 2 },
+                        { label: t('fileshare.downloadOptions.xdownload', 3), value: 3 },
+                        { label: t('fileshare.downloadOptions.xdownload', 5), value: 5 },
+                        { label: t('fileshare.downloadOptions.xdownload', 10), value: 10 },
                     ]"
                 />
                 {{ t('fileshare.or') }}

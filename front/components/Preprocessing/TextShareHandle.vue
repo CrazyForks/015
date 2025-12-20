@@ -21,11 +21,11 @@ const props = defineProps<{
                     name="download_nums"
                     :label="t('textshare.viewNums')"
                     :options="[
-                        { label: t('textshare.viewOptions.1time'), value: 1 },
-                        { label: t('textshare.viewOptions.2times'), value: 2 },
-                        { label: t('textshare.viewOptions.3times'), value: 3 },
-                        { label: t('textshare.viewOptions.5times'), value: 5 },
-                        { label: t('textshare.viewOptions.10times'), value: 10 },
+                        { label: t('textshare.viewOptions.xview', 1), value: 1 },
+                        { label: t('textshare.viewOptions.xview', 2), value: 2 },
+                        { label: t('textshare.viewOptions.xview', 3), value: 3 },
+                        { label: t('textshare.viewOptions.xview', 5), value: 5 },
+                        { label: t('textshare.viewOptions.xview', 10), value: 10 },
                     ]"
                 />
                 {{ t('textshare.or') }}
