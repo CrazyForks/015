@@ -58,5 +58,5 @@ jobs:
             - name: Run golangci-lint
               uses: golangci/golangci-lint-action@v9
               with:
-                  version: latest
+                  skip-cache: true
                   working-directory: worker
