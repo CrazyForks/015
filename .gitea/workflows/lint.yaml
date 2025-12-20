@@ -38,7 +38,7 @@ jobs:
               with:
                   go-version: '1.25'
 
-            - name: Install golangci-lint
+            - name: Run golangci-lint
               uses: golangci/golangci-lint-action@v9
               with:
                   version: latest
@@ -55,7 +55,7 @@ jobs:
               with:
                   go-version: '1.25'
 
-            - name: Install golangci-lint
+            - name: Run golangci-lint
               uses: golangci/golangci-lint-action@v9
               with:
                   version: latest
