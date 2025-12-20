@@ -1,7 +1,19 @@
 <script setup lang="ts">
-import { LucidePlay, LucideSettings, LucideSquare } from 'lucide-vue-next'
+import {
+    LucidePlay,
+    LucideSettings,
+    LucideSquare,
+    LucideInfo,
+    LucideFolders,
+    LucideArrowUpFromLine,
+    LucideCircleX,
+    LucideCheckCircle,
+    LucideLoaderCircle,
+    LucideArrowDownUp,
+} from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 import FileUploadBlockProgressView from '@/components/FileUploadBlockProgressView.vue'
+import FileUploadHeatMapView from '@/components/FileUploadHeatMapView.vue'
 import { motion } from 'motion-v'
 import getFileSize from '~/lib/getFileSize'
 import { cx } from 'class-variance-authority'
@@ -24,6 +36,7 @@ const emit = defineEmits<{
     (e: 'change', key: string): void
 }>()
 const form = useFormContext()
+const { t } = useI18n()
 
 const selectedFile = ref()
 const uploadfiles = ref<
@@ -136,8 +149,8 @@ const { error, execute, isLoading } = useAsyncState(
 
                     if (queueType === 'async') {
                         if (!!retry && retry >= 3) {
-                            toast.error('上传错误', {
-                                description: `文件 ${file?.file?.name} 的${index}分块经过多次尝试依然上传失败, 我们已经终止该文件上传`,
+                            toast.error(t('page.progress.file.uploadError'), {
+                                description: t('page.progress.file.chunkUploadFailed', [file?.file?.name, index]),
                             })
                             uploadfiles.value[uploadFileIndex].status = 'error'
                             return
@@ -170,14 +183,14 @@ const { error, execute, isLoading } = useAsyncState(
                         // todo 重新加入队列
                         if (queueType === 'async') {
                             uploadfiles.value[uploadFileIndex]?.queue.push({ ...task, retry: (task?.retry || 0) + 1 })
-                            toast.warning('上传错误', {
-                                description: `文件 ${file?.file?.name} 的${index}分块上传失败, 我们将在稍后再次尝试上传`,
+                            toast.warning(t('page.progress.file.uploadError'), {
+                                description: t('page.progress.file.chunkUploadRetry', [file?.file?.name, index]),
                             })
                         }
                         if (queueType === 'sync') {
                             uploadfiles.value[uploadFileIndex].status = 'error'
-                            toast.error('上传错误', {
-                                description: `文件${file?.file?.name}上传失败, 请重试`,
+                            toast.error(t('page.progress.file.uploadError'), {
+                                description: t('page.progress.file.fileUploadFailed', [file?.file?.name]),
                             })
                         }
                     } finally {
@@ -285,7 +298,7 @@ const handleUpload = async (fileId: string, index: number) => {
     })
     const { code } = res || {}
     if (code !== 200) {
-        throw new Error('上传失败')
+        throw new Error(t('page.progress.file.uploadFailed'))
     }
     uploadfile.uploadInfo!.chunks[index].status = 'success'
     if (Object.entries(uploadfile.uploadInfo!.chunks || {}).filter(([index, chunk]) => chunk.status === 'success').length === chunkLength) {
@@ -307,7 +320,7 @@ const handleFinish = async (fileId: string) => {
         },
     })
     if (res?.code !== 200) {
-        throw new Error('上传失败')
+        throw new Error(t('page.progress.file.uploadFailed'))
     }
     uploadfile.status = 'finish'
 }
@@ -345,7 +358,7 @@ const handleShowSpeedInfo = () => {
         <div class="rounded-xl p-3 bg-white/80 flex flex-col gap-2 col-span-4 md:col-span-3 h-32 md:h-auto">
             <div class="flex flex-col gap-1">
                 <div @click="handleShowSpeedInfo" class="flex flex-row gap-1 items-center text-xs opacity-70">
-                    总上传进度
+                    {{ t('page.progress.file.totalUploadProgress') }}
                     <LucideInfo class="size-3" />
                 </div>
                 <div class="text-2xl font-bold">
@@ -384,7 +397,7 @@ const handleShowSpeedInfo = () => {
             </div>
             <div class="flex flex-col gap-2 justify-between p-3 h-full relative z-[1]">
                 <div class="flex flex-col gap-1">
-                    <div class="text-xs opacity-70">总上传进度</div>
+                    <div class="text-xs opacity-70">{{ t('page.progress.file.totalUploadProgress') }}</div>
                     <div class="text-4xl font-bold">{{ (totalUploadProgress || 0).toFixed(1) }}%</div>
                 </div>
                 <div class="flex flex-row gap-2">
@@ -421,16 +434,19 @@ const handleShowSpeedInfo = () => {
             </div>
         </div>
         <div class="col-span-4 flex flex-col bg-white/80 rounded-xl p-3 text-md gap-5">
-            <div>文件列表</div>
+            <div class="flex flex-row gap-2 items-center">
+                <LucideFolders class="size-4" />
+                {{ t('page.progress.file.fileList') }}
+            </div>
             <div class="flex flex-col -mx-3 text-sm">
                 <div class="grid grid-cols-[2fr_6rem_6rem] md:grid-cols-[2fr_6rem_6rem_4fr] gap-2 border-b border-black/20 pb-2 px-3">
-                    <div>文件名</div>
-                    <div>文件大小</div>
+                    <div>{{ t('page.progress.file.fileName') }}</div>
+                    <div>{{ t('page.progress.file.fileSize') }}</div>
                     <div @click="handleShowSpeedInfo" class="flex flex-row gap-1 items-center">
-                        上传速度
+                        {{ t('page.progress.file.uploadSpeed') }}
                         <LucideInfo class="size-3" />
                     </div>
-                    <div class="hidden md:block">进度</div>
+                    <div class="hidden md:block">{{ t('page.progress.file.progress') }}</div>
                 </div>
                 <div
                     :class="
@@ -490,11 +506,11 @@ const handleShowSpeedInfo = () => {
                         v-if="['hash', 'create', 'chunk']?.includes(item?.procressType)"
                     >
                         <LucideLoaderCircle class="size-4 animate-spin" />
-                        <div>正在{{ item?.procressType }}中...</div>
+                        <div>{{ t(`page.progress.file.processing.${item?.procressType}`) }}</div>
                     </div>
                     <div class="flex flex-row gap-2 items-center col-span-3 md:col-span-1" v-if="item?.procressType === 'finish'">
-                        {{ item?.status === 'finish' ? '云端已有相同hash文件, 秒传成功' : null }}
-                        {{ item?.status === 'error' ? '上传失败，请稍后重试' : null }}
+                        {{ item?.status === 'finish' ? t('page.progress.file.instantUploadSuccess') : null }}
+                        {{ item?.status === 'error' ? t('page.progress.file.uploadFailedRetry') : null }}
                     </div>
                     <div class="flex flex-row gap-2 items-center col-span-3 md:col-span-1" v-if="item?.procressType === 'upload'">
                         <div class="rounded-full bg-white/50 w-full h-2 overflow-hidden border border-white">
@@ -527,27 +543,33 @@ const handleShowSpeedInfo = () => {
             </div>
         </div>
         <div class="col-span-4 flex flex-col bg-white/80 rounded-xl p-3 gap-5" v-if="selectedFile">
-            <div>上传详情</div>
+            <div class="flex flex-row gap-2 items-center">
+                <LucideInfo class="size-4" />
+                {{ t('page.progress.file.uploadDetails') }}
+            </div>
             <div class="grid grid-cols-3 text-sm gap-3">
                 <div>
-                    区块： {{ selectedUploadfile?.uploadInfo?.chunkLength }} x {{ getFileSize(selectedUploadfile?.uploadInfo?.ChunkSize as number) }}
+                    {{ t('page.progress.file.chunk') }}: {{ selectedUploadfile?.uploadInfo?.chunkLength }} x
+                    {{ getFileSize(selectedUploadfile?.uploadInfo?.ChunkSize as number) }}
                 </div>
-                <div class="truncate col-span-2">hash: {{ selectedUploadfile?.hash }}</div>
-                <div>已完成: {{ selectedUploadfileChunk?.filter((r) => r.status === 'success')?.length || 0 }}</div>
-                <div>已丢弃: {{ selectedUploadfileChunk?.filter((r) => r.status === 'error')?.length || 0 }}</div>
+                <div class="truncate col-span-2">Hash: {{ selectedUploadfile?.hash }}</div>
+                <div>{{ t('page.progress.file.completed') }}: {{ selectedUploadfileChunk?.filter((r) => r.status === 'success')?.length || 0 }}</div>
+                <div>{{ t('page.progress.file.discarded') }}: {{ selectedUploadfileChunk?.filter((r) => r.status === 'error')?.length || 0 }}</div>
                 <div>
-                    待完成:
+                    {{ t('page.progress.file.pending') }}:
                     {{ (selectedUploadfile?.uploadInfo?.chunkLength || 0) - (selectedUploadfileChunk?.length || 0) }}
                 </div>
                 <div class="col-span-3 flex flex-row justify-between items-center">
-                    <div class="text-md font-bold">{{ selectedUploadfileViewMode === 'progress' ? '区块进度条' : '区块热力图' }}</div>
+                    <div class="text-md font-bold">
+                        {{ selectedUploadfileViewMode === 'progress' ? t('page.progress.file.chunkProgress') : t('page.progress.file.chunkHeatmap') }}
+                    </div>
                     <Button
                         size="sm"
                         class="ml-auto text-xs"
                         @click="selectedUploadfileViewMode = selectedUploadfileViewMode === 'progress' ? 'heatmap' : 'progress'"
                     >
                         <LucideArrowDownUp class="size-4" />
-                        {{ selectedUploadfileViewMode === 'progress' ? '热力图' : '进度条' }}
+                        {{ selectedUploadfileViewMode === 'progress' ? t('page.progress.file.heatmap') : t('page.progress.file.progressBar') }}
                     </Button>
                 </div>
                 <div class="h-7 col-span-3 flex flex-row gap-2 items-center" v-if="selectedUploadfileViewMode === 'progress'">

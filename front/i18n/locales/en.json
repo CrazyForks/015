@@ -81,6 +81,38 @@
                 }
             }
         },
+        "progress": {
+            "file": {
+                "totalUploadProgress": "Total Upload Progress",
+                "fileList": "File List",
+                "fileName": "File Name",
+                "fileSize": "File Size",
+                "uploadSpeed": "Speed",
+                "progress": "Progress",
+                "uploadDetails": "Upload Details",
+                "chunk": "Chunk",
+                "completed": "Completed",
+                "discarded": "Discarded",
+                "pending": "Pending",
+                "chunkProgress": "Chunk Progress",
+                "chunkHeatmap": "Chunk Heatmap",
+                "heatmap": "Heatmap",
+                "progressBar": "Progress Bar",
+                "uploadError": "Upload Error",
+                "chunkUploadFailed": "Chunk {1} of file {0} failed after multiple attempts, we have terminated the file upload",
+                "chunkUploadRetry": "Chunk {1} of file {0} failed to upload, we will try again later",
+                "fileUploadFailed": "File {0} upload failed, please try again",
+                "uploadFailed": "Upload Failed",
+                "processing": {
+                    "hash": "Calculating Hash...",
+                    "create": "Initializing Upload...",
+                    "upload": "Uploading...",
+                    "finish": "Upload Finished"
+                },
+                "instantUploadSuccess": "File with same hash exists in cloud, instant upload successful",
+                "uploadFailedRetry": "Upload failed, please try again later"
+            }
+        },
         "result": {
             "file": {
                 "title": "Upload Successful",

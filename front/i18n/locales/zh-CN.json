@@ -81,6 +81,38 @@
                 }
             }
         },
+        "progress": {
+            "file": {
+                "totalUploadProgress": "总上传进度",
+                "fileList": "文件列表",
+                "fileName": "文件名",
+                "fileSize": "文件大小",
+                "uploadSpeed": "上传速度",
+                "progress": "进度",
+                "uploadDetails": "上传详情",
+                "chunk": "区块",
+                "completed": "已完成",
+                "discarded": "已丢弃",
+                "pending": "待完成",
+                "chunkProgress": "区块进度条",
+                "chunkHeatmap": "区块热力图",
+                "heatmap": "热力图",
+                "progressBar": "进度条",
+                "uploadError": "上传错误",
+                "chunkUploadFailed": "文件 {0} 的{1}分块经过多次尝试依然上传失败, 我们已经终止该文件上传",
+                "chunkUploadRetry": "文件 {0} 的{1}分块上传失败, 我们将在稍后再次尝试上传",
+                "fileUploadFailed": "文件{0}上传失败, 请重试",
+                "uploadFailed": "上传失败",
+                "processing": {
+                    "hash": "计算Hash...",
+                    "create": "初始化上传...",
+                    "upload": "上传中...",
+                    "finish": "上传完成"
+                },
+                "instantUploadSuccess": "云端已有相同Hash文件, 秒传成功",
+                "uploadFailedRetry": "上传失败，请稍后重试"
+            }
+        },
         "result": {
             "file": {
                 "title": "上传成功",
