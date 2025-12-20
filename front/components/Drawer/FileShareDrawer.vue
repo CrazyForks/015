@@ -35,7 +35,7 @@ const isPPT = computed(() => props.file.every((r) => r?.type?.startsWith('applic
 const isDocument = computed(() => isPDF.value || isDOC.value || isXLS.value || isPPT.value)
 const actions = [
     {
-        label: t('file.handleType.file-share'),
+        label: t('page.upload.file.handleType.file-share'),
         icon: LucideShare,
         className: 'bg-green-300',
         onClick: () => {
@@ -45,7 +45,7 @@ const actions = [
         },
     },
     isImage.value && {
-        label: t('file.handleType.file-image-compress'),
+        label: t('page.upload.file.handleType.file-image-compress'),
         icon: LucideImageMinus,
         className: 'bg-red-300',
         onClick: () => {

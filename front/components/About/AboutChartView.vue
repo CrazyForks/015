@@ -51,28 +51,28 @@ const { t } = useI18n()
 const chartTabs = computed(() => {
     return [
         {
-            label: t('about.file'),
+            label: t('page.about.file'),
             value: 'storage',
             total: data.value?.chart?.storage
                 ? Object.values(data.value.chart.storage).reduce((acc: number, curr: StatChartData) => acc + curr.file_num, 0)
                 : 0,
         },
         {
-            label: t('about.share'),
+            label: t('page.about.share'),
             value: 'share',
             total: data.value?.chart?.storage
                 ? Object.values(data.value.chart.storage).reduce((acc: number, curr: StatChartData) => acc + curr.share_num, 0)
                 : 0,
         },
         {
-            label: t('about.download'),
+            label: t('page.about.download'),
             value: 'download',
             total: data.value?.chart?.storage
                 ? Object.values(data.value.chart.storage).reduce((acc: number, curr: StatChartData) => acc + curr.download_num, 0)
                 : 0,
         },
         {
-            label: t('about.task'),
+            label: t('page.about.task'),
             value: 'queue',
             total: data.value?.chart?.queue
                 ? Object.values(data.value.chart.queue).reduce((acc: number, curr: QueueChartData) => acc + curr.processed + curr.failed, 0)
@@ -144,7 +144,7 @@ const currentChartData = computed((): ChartConfig => {
 </script>
 
 <template>
-    <div class="font-semibold">{{ t('about.analysis') }}</div>
+    <div class="font-semibold">{{ t('page.about.analysis') }}</div>
     <template v-if="isLoading">
         <div class="flex flex-row gap-2">
             <Skeleton class="w-full h-96 rounded-xl" />

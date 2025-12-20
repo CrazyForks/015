@@ -16,6 +16,6 @@ const { t } = useI18n()
         "
     >
         <LucideArchive class="size-4" />
-        {{ t('pickup.btn') }}
+        {{ t('page.upload.pickup.btn') }}
     </AsyncButton>
 </template>

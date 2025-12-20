@@ -13,106 +13,114 @@
         "submit": "提交",
         "backToHome": "返回首页"
     },
-    "file": {
-        "uploadFile": "上传文件",
-        "uploadFilePlaceholder": "拖拽文件 或 点击上传",
-        "addMore": "添加更多",
-        "handleType": {
-            "file-share": "文件分享",
-            "file-image-compress": "图片压缩"
-        }
-    },
-    "text": {
-        "uploadText": "上传文本",
-        "uploadTextPlaceholder": "使用我们的文本处理器轻松分享，翻译，总结，生成图片，询问大模型",
-        "handleType": {
-            "text-share": "文本分享"
-        }
-    },
-    "pickup": {
-        "title": "输入取件码",
-        "codeError": "取件码错误",
-        "btn": "取件"
-    },
-    "fileshare": {
-        "title": "分享选项",
-        "downloadNums": "下载次数",
-        "expireTime": "过期时间",
-        "or": "或",
-        "expireAfter": "后过期",
-        "pickupCode": "取件码",
-        "passwordProtection": "密码保护",
-        "downloadNotify": "下载通知",
-        "passwordPlaceholder": "请输入密码",
-        "emailPlaceholder": "请输入邮箱",
-        "downloadOptions": {
-            "xdownload": "{0}次下载"
+    "page": {
+        "upload": {
+            "file": {
+                "uploadFile": "上传文件",
+                "uploadFilePlaceholder": "拖拽文件 或 点击上传",
+                "addMore": "添加更多",
+                "handleType": {
+                    "file-share": "文件分享",
+                    "file-image-compress": "图片压缩"
+                }
+            },
+            "text": {
+                "uploadText": "上传文本",
+                "uploadTextPlaceholder": "使用我们的文本处理器轻松分享，翻译，总结，生成图片，询问大模型",
+                "handleType": {
+                    "text-share": "文本分享"
+                }
+            },
+            "pickup": {
+                "title": "输入取件码",
+                "codeError": "取件码错误",
+                "btn": "取件"
+            }
         },
-        "expireOptions": {
-            "5min": "5分钟",
-            "1hour": "1小时",
-            "1day": "1天",
-            "3days": "3天"
-        }
-    },
-    "textshare": {
-        "title": "分享选项",
-        "viewNums": "浏览次数",
-        "expireTime": "过期时间",
-        "or": "或",
-        "expireAfter": "后过期",
-        "pickupCode": "取件码",
-        "passwordProtection": "密码保护",
-        "readNotify": "已读通知",
-        "passwordPlaceholder": "请输入密码",
-        "emailPlaceholder": "请输入邮箱",
-        "viewOptions": {
-            "xview": "{0}次浏览"
+        "shareOptions": {
+            "file": {
+                "title": "分享选项",
+                "downloadNums": "下载次数",
+                "expireTime": "过期时间",
+                "or": "或",
+                "expireAfter": "后过期",
+                "pickupCode": "取件码",
+                "passwordProtection": "密码保护",
+                "downloadNotify": "下载通知",
+                "passwordPlaceholder": "请输入密码",
+                "emailPlaceholder": "请输入邮箱",
+                "downloadOptions": {
+                    "xdownload": "{0}次下载"
+                },
+                "expireOptions": {
+                    "5min": "5分钟",
+                    "1hour": "1小时",
+                    "1day": "1天",
+                    "3days": "3天"
+                }
+            },
+            "text": {
+                "title": "分享选项",
+                "viewNums": "浏览次数",
+                "expireTime": "过期时间",
+                "or": "或",
+                "expireAfter": "后过期",
+                "pickupCode": "取件码",
+                "passwordProtection": "密码保护",
+                "readNotify": "已读通知",
+                "passwordPlaceholder": "请输入密码",
+                "emailPlaceholder": "请输入邮箱",
+                "viewOptions": {
+                    "xview": "{0}次浏览"
+                },
+                "expireOptions": {
+                    "5min": "5分钟",
+                    "1hour": "1小时",
+                    "1day": "1天",
+                    "3days": "3天"
+                }
+            }
         },
-        "expireOptions": {
-            "5min": "5分钟",
-            "1hour": "1小时",
-            "1day": "1天",
-            "3days": "3天"
+        "result": {
+            "file": {
+                "title": "上传成功",
+                "fileList": "文件列表",
+                "info": "信息",
+                "downloadNums": "下载次数",
+                "expireTime": "过期时间",
+                "pickupCode": "提取码",
+                "link": "链接",
+                "copySuccess": "复制成功"
+            },
+            "text": {
+                "title": "分享成功",
+                "info": "信息",
+                "viewNums": "浏览次数",
+                "expireTime": "过期时间",
+                "pickupCode": "提取码",
+                "link": "链接",
+                "content": "内容",
+                "copySuccess": "复制成功"
+            }
+        },
+        "about": {
+            "powerBy": "由 {0} 驱动的开源自托管临时文件分享平台",
+            "file": "文件",
+            "share": "分享",
+            "download": "下载",
+            "task": "任务",
+            "admin": "本站管理员",
+            "author": "作者",
+            "title": "关于",
+            "about": "关于",
+            "systemInfo": "系统信息",
+            "systemVersion": "系统版本",
+            "storage": "已托管的文件",
+            "analysis": "分析",
+            "fileSize": "文件大小",
+            "fileNum": "文件数量",
+            "processed": "处理数量",
+            "failed": "失败数量"
         }
-    },
-    "fileshareresult": {
-        "title": "上传成功",
-        "fileList": "文件列表",
-        "info": "信息",
-        "downloadNums": "下载次数",
-        "expireTime": "过期时间",
-        "pickupCode": "提取码",
-        "link": "链接",
-        "copySuccess": "复制成功"
-    },
-    "textshareresult": {
-        "title": "分享成功",
-        "info": "信息",
-        "viewNums": "浏览次数",
-        "expireTime": "过期时间",
-        "pickupCode": "提取码",
-        "link": "链接",
-        "content": "内容",
-        "copySuccess": "复制成功"
-    },
-    "about": {
-        "powerBy": "由 {0} 驱动的开源自托管临时文件分享平台",
-        "file": "文件",
-        "share": "分享",
-        "download": "下载",
-        "task": "任务",
-        "admin": "本站管理员",
-        "author": "作者",
-        "title": "关于",
-        "about": "关于",
-        "systemInfo": "系统信息",
-        "systemVersion": "系统版本",
-        "storage": "已托管的文件",
-        "analysis": "分析",
-        "fileSize": "文件大小",
-        "fileNum": "文件数量",
-        "processed": "处理数量",
-        "failed": "失败数量"
     }
 }

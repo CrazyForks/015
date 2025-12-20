@@ -45,7 +45,7 @@ const { t } = useI18n()
     <div class="flex flex-col gap-3">
         <div class="flex flex-row gap-2">
             <div class="flex flex-row justify-between w-full">
-                <h2 class="text-lg">{{ t('textshareresult.title') }}</h2>
+                <h2 class="text-lg">{{ t('page.result.text.title') }}</h2>
                 <Button
                     variant="outline"
                     class="bg-white/70"
@@ -62,21 +62,21 @@ const { t } = useI18n()
         </div>
         <div class="flex flex-col md:flex-row gap-5 rounded-md p-5 bg-white/20 backdrop-blur-xl w-full">
             <div class="flex flex-col gap-2 flex-1">
-                <div class="text-sm font-semibold">{{ t('textshareresult.info') }}</div>
+                <div class="text-sm font-semibold">{{ t('page.result.text.info') }}</div>
                 <div class="grid grid-cols-2 gap-2">
                     <div class="rounded-xl flex flex-col bg-black/10 px-3 py-2 gap-1">
-                        <div class="text-xs font-semibold">{{ t('textshareresult.viewNums') }}</div>
+                        <div class="text-xs font-semibold">{{ t('page.result.text.viewNums') }}</div>
                         <div class="text-3xl font-light">{{ data?.download_nums }}</div>
                     </div>
                     <div class="rounded-xl flex flex-col bg-black/5 px-3 py-2 gap-1">
-                        <div class="text-xs font-semibold">{{ t('textshareresult.expireTime') }}</div>
+                        <div class="text-xs font-semibold">{{ t('page.result.text.expireTime') }}</div>
                         <div class="text-md font-light">
                             {{ dayjs((data?.expire_at ?? 0) * 1000).format('YYYY-MM-DD HH:mm:ss') }}
                         </div>
                     </div>
                     <div class="rounded-xl flex flex-col bg-black/10 px-3 py-2 gap-1" v-if="data?.pickup_code">
                         <div class="flex flex-row justify-between w-full items-center">
-                            <div class="text-xs font-semibold">{{ t('textshareresult.pickupCode') }}</div>
+                            <div class="text-xs font-semibold">{{ t('page.result.text.pickupCode') }}</div>
                             <Button
                                 variant="outline"
                                 class="bg-white/70 p-0 size-6"
@@ -84,7 +84,7 @@ const { t } = useI18n()
                                 @click="
                                     () => {
                                         copy(data?.pickup_code as string)
-                                        toast.success(t('textshareresult.copySuccess'))
+                                        toast.success(t('page.result.text.copySuccess'))
                                     }
                                 "
                             >
@@ -100,7 +100,7 @@ const { t } = useI18n()
                 </div>
             </div>
             <div class="flex flex-col gap-5 flex-1">
-                <div class="text-sm font-semibold">{{ t('textshareresult.link') }}</div>
+                <div class="text-sm font-semibold">{{ t('page.result.text.link') }}</div>
                 <div class="flex flex-row gap-2">
                     <Input v-model="url" class="bg-white/70" readonly />
                     <Button
@@ -110,7 +110,7 @@ const { t } = useI18n()
                         @click="
                             () => {
                                 copy(url)
-                                toast.success(t('textshareresult.copySuccess'))
+                                toast.success(t('page.result.text.copySuccess'))
                             }
                         "
                     >
@@ -138,7 +138,7 @@ const { t } = useI18n()
                 </div>
             </div>
         </div>
-        <h2 class="text-md">{{ t('textshareresult.content') }}</h2>
+        <h2 class="text-md">{{ t('page.result.text.content') }}</h2>
         <MarkdownRender class="prose rounded-md bg-white/70 p-3 w-full max-w-full min-h-[30vh]" :markdown="props?.data?.text" />
     </div>
 </template>

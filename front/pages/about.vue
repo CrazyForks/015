@@ -7,7 +7,7 @@ const { t } = useI18n()
 
 <template>
     <div class="rounded-xl p-5 bg-white/50 backdrop-blur-xl w-full lg:w-200 my-5 flex flex-col gap-5">
-        <div class="text-xl font-normal">{{ t('about.title') }}</div>
+        <div class="text-xl font-normal">{{ t('page.about.title') }}</div>
         <AboutBaseInfo />
         <AboutChartView />
         <AboutVersionView />

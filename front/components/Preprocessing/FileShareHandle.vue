@@ -15,37 +15,37 @@ const props = defineProps<{
 <template>
     <VeeForm v-slot="{ values, setFieldValue }" :initialValues="{ download_nums: 1, expire_time: 1440 }">
         <div class="flex flex-col gap-3">
-            <h2 class="text-lg font-bold">{{ t('fileshare.title') }}</h2>
+            <h2 class="text-lg font-bold">{{ t('page.shareOptions.file.title') }}</h2>
             <div class="flex flex-row items-center gap-2 text-sm">
                 <SelectField
                     name="download_nums"
-                    :label="t('fileshare.downloadNums')"
+                    :label="t('page.shareOptions.file.downloadNums')"
                     :options="[
-                        { label: t('fileshare.downloadOptions.xdownload', 1), value: 1 },
-                        { label: t('fileshare.downloadOptions.xdownload', 2), value: 2 },
-                        { label: t('fileshare.downloadOptions.xdownload', 3), value: 3 },
-                        { label: t('fileshare.downloadOptions.xdownload', 5), value: 5 },
-                        { label: t('fileshare.downloadOptions.xdownload', 10), value: 10 },
+                        { label: t('page.shareOptions.file.downloadOptions.xdownload', 1), value: 1 },
+                        { label: t('page.shareOptions.file.downloadOptions.xdownload', 2), value: 2 },
+                        { label: t('page.shareOptions.file.downloadOptions.xdownload', 3), value: 3 },
+                        { label: t('page.shareOptions.file.downloadOptions.xdownload', 5), value: 5 },
+                        { label: t('page.shareOptions.file.downloadOptions.xdownload', 10), value: 10 },
                     ]"
                 />
-                {{ t('fileshare.or') }}
+                {{ t('page.shareOptions.file.or') }}
                 <SelectField
                     name="expire_time"
-                    :label="t('fileshare.expireTime')"
+                    :label="t('page.shareOptions.file.expireTime')"
                     :options="[
-                        { label: t('fileshare.expireOptions.5min'), value: 5 },
-                        { label: t('fileshare.expireOptions.1hour'), value: 60 },
-                        { label: t('fileshare.expireOptions.1day'), value: 1440 },
-                        { label: t('fileshare.expireOptions.3days'), value: 4320 },
+                        { label: t('page.shareOptions.file.expireOptions.5min'), value: 5 },
+                        { label: t('page.shareOptions.file.expireOptions.1hour'), value: 60 },
+                        { label: t('page.shareOptions.file.expireOptions.1day'), value: 1440 },
+                        { label: t('page.shareOptions.file.expireOptions.3days'), value: 4320 },
                     ]"
                 />
-                {{ t('fileshare.expireAfter') }}
+                {{ t('page.shareOptions.file.expireAfter') }}
             </div>
             <div class="flex flex-col gap-1">
                 <div class="flex flex-row gap-3 min-h-9">
                     <SwitchField
                         name="has_pickup_code"
-                        :label="t('fileshare.pickupCode')"
+                        :label="t('page.shareOptions.file.pickupCode')"
                         :rules="
                             (value: boolean) => {
                                 if (!!value) {
@@ -59,7 +59,7 @@ const props = defineProps<{
                 <div class="flex flex-row gap-3 min-h-9">
                     <SwitchField
                         name="has_password"
-                        :label="t('fileshare.passwordProtection')"
+                        :label="t('page.shareOptions.file.passwordProtection')"
                         :rules="
                             (value: boolean) => {
                                 if (!!value) {
@@ -69,11 +69,21 @@ const props = defineProps<{
                             }
                         "
                     />
-                    <InputField v-if="!!values.has_password" name="password" :placeholder="t('fileshare.passwordPlaceholder')" rules="required" />
+                    <InputField
+                        v-if="!!values.has_password"
+                        name="password"
+                        :placeholder="t('page.shareOptions.file.passwordPlaceholder')"
+                        rules="required"
+                    />
                 </div>
                 <div class="flex flex-row gap-3 min-h-9">
-                    <SwitchField name="has_notify" :label="t('fileshare.downloadNotify')" />
-                    <InputField v-if="!!values.has_notify" name="notify_email" :placeholder="t('fileshare.emailPlaceholder')" rules="required" />
+                    <SwitchField name="has_notify" :label="t('page.shareOptions.file.downloadNotify')" />
+                    <InputField
+                        v-if="!!values.has_notify"
+                        name="notify_email"
+                        :placeholder="t('page.shareOptions.file.emailPlaceholder')"
+                        rules="required"
+                    />
                 </div>
             </div>
             <FormButton

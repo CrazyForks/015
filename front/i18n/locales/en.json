@@ -13,106 +13,114 @@
         "submit": "Submit",
         "backToHome": "Back to Home"
     },
-    "file": {
-        "uploadFile": "Upload File",
-        "uploadFilePlaceholder": "Drag and drop files or click to upload",
-        "addMore": "Add More",
-        "handleType": {
-            "file-share": "File Share",
-            "file-image-compress": "Image Compress"
-        }
-    },
-    "text": {
-        "uploadText": "Upload Text",
-        "uploadTextPlaceholder": "Share, translate, summarize, generate images, and ask large models with our text processor",
-        "handleType": {
-            "text-share": "Text Share"
-        }
-    },
-    "pickup": {
-        "title": "Enter Pickup Code",
-        "codeError": "Invalid pickup code",
-        "btn": "Pickup"
-    },
-    "fileshare": {
-        "title": "Share Options",
-        "downloadNums": "Download Count",
-        "expireTime": "Expire Time",
-        "or": "or",
-        "expireAfter": "expire",
-        "pickupCode": "Pickup Code",
-        "passwordProtection": "Password Protection",
-        "downloadNotify": "Download Notification",
-        "passwordPlaceholder": "Enter password",
-        "emailPlaceholder": "Enter email",
-        "downloadOptions": {
-            "xdownload": "{0} downloads"
+    "page": {
+        "upload": {
+            "file": {
+                "uploadFile": "Upload File",
+                "uploadFilePlaceholder": "Drag and drop files or click to upload",
+                "addMore": "Add More",
+                "handleType": {
+                    "file-share": "File Share",
+                    "file-image-compress": "Image Compress"
+                }
+            },
+            "text": {
+                "uploadText": "Upload Text",
+                "uploadTextPlaceholder": "Share, translate, summarize, generate images, and ask large models with our text processor",
+                "handleType": {
+                    "text-share": "Text Share"
+                }
+            },
+            "pickup": {
+                "title": "Enter Pickup Code",
+                "codeError": "Invalid pickup code",
+                "btn": "Pickup"
+            }
         },
-        "expireOptions": {
-            "5min": "5 minutes",
-            "1hour": "1 hour",
-            "1day": "1 day",
-            "3days": "3 days"
-        }
-    },
-    "textshare": {
-        "title": "Share Options",
-        "viewNums": "View Count",
-        "expireTime": "Expire Time",
-        "or": "or",
-        "expireAfter": "expire",
-        "pickupCode": "Pickup Code",
-        "passwordProtection": "Password Protection",
-        "readNotify": "Read Notification",
-        "passwordPlaceholder": "Enter password",
-        "emailPlaceholder": "Enter email",
-        "viewOptions": {
-            "xview": "{0} views"
+        "shareOptions": {
+            "file": {
+                "title": "Share Options",
+                "downloadNums": "Download Count",
+                "expireTime": "Expire Time",
+                "or": "or",
+                "expireAfter": "expire",
+                "pickupCode": "Pickup Code",
+                "passwordProtection": "Password Protection",
+                "downloadNotify": "Download Notification",
+                "passwordPlaceholder": "Enter password",
+                "emailPlaceholder": "Enter email",
+                "downloadOptions": {
+                    "xdownload": "{0} downloads"
+                },
+                "expireOptions": {
+                    "5min": "5 minutes",
+                    "1hour": "1 hour",
+                    "1day": "1 day",
+                    "3days": "3 days"
+                }
+            },
+            "text": {
+                "title": "Share Options",
+                "viewNums": "View Count",
+                "expireTime": "Expire Time",
+                "or": "or",
+                "expireAfter": "expire",
+                "pickupCode": "Pickup Code",
+                "passwordProtection": "Password Protection",
+                "readNotify": "Read Notification",
+                "passwordPlaceholder": "Enter password",
+                "emailPlaceholder": "Enter email",
+                "viewOptions": {
+                    "xview": "{0} views"
+                },
+                "expireOptions": {
+                    "5min": "5 minutes",
+                    "1hour": "1 hour",
+                    "1day": "1 day",
+                    "3days": "3 days"
+                }
+            }
         },
-        "expireOptions": {
-            "5min": "5 minutes",
-            "1hour": "1 hour",
-            "1day": "1 day",
-            "3days": "3 days"
+        "result": {
+            "file": {
+                "title": "Upload Successful",
+                "fileList": "File List",
+                "info": "Info",
+                "downloadNums": "Download Count",
+                "expireTime": "Expire Time",
+                "pickupCode": "Pickup Code",
+                "link": "Link",
+                "copySuccess": "Copy Success"
+            },
+            "text": {
+                "title": "Share Successful",
+                "info": "Info",
+                "viewNums": "View Count",
+                "expireTime": "Expire Time",
+                "pickupCode": "Pickup Code",
+                "link": "Link",
+                "content": "Content",
+                "copySuccess": "Copy Success"
+            }
+        },
+        "about": {
+            "powerBy": "Power by {0} as a open source temporary file sharing platform",
+            "file": "File",
+            "share": "Share",
+            "download": "Download",
+            "task": "Task",
+            "admin": "Site Admin",
+            "author": "Author",
+            "title": "About",
+            "about": "About",
+            "systemInfo": "System Info",
+            "systemVersion": "System Version",
+            "storage": "Storage",
+            "analysis": "Analysis",
+            "fileSize": "File Size",
+            "fileNum": "File Num",
+            "processed": "Processed",
+            "failed": "Failed"
         }
-    },
-    "fileshareresult": {
-        "title": "Upload Successful",
-        "fileList": "File List",
-        "info": "Info",
-        "downloadNums": "Download Count",
-        "expireTime": "Expire Time",
-        "pickupCode": "Pickup Code",
-        "link": "Link",
-        "copySuccess": "Copy Success"
-    },
-    "textshareresult": {
-        "title": "Share Successful",
-        "info": "Info",
-        "viewNums": "View Count",
-        "expireTime": "Expire Time",
-        "pickupCode": "Pickup Code",
-        "link": "Link",
-        "content": "Content",
-        "copySuccess": "Copy Success"
-    },
-    "about": {
-        "powerBy": "Power by {0} as a open source temporary file sharing platform",
-        "file": "File",
-        "share": "Share",
-        "download": "Download",
-        "task": "Task",
-        "admin": "Site Admin",
-        "author": "Author",
-        "title": "About",
-        "about": "About",
-        "systemInfo": "System Info",
-        "systemVersion": "System Version",
-        "storage": "Storage",
-        "analysis": "Analysis",
-        "fileSize": "File Size",
-        "fileNum": "File Num",
-        "processed": "Processed",
-        "failed": "Failed"
     }
 }
