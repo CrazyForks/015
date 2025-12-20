@@ -110,7 +110,15 @@
                     "finish": "Upload Finished"
                 },
                 "instantUploadSuccess": "File with same hash exists in cloud, instant upload successful",
-                "uploadFailedRetry": "Upload failed, please try again later"
+                "uploadFailedRetry": "Upload failed, please try again later",
+                "uploadSpeedInfo": {
+                    "title": "How is the upload speed calculated?",
+                    "desc": {
+                        "base": "The upload speed is estimated based on {chunkNum} * {chunkSize} uploaded in the current second, which may have some deviation from the actual upload speed, for reference only",
+                        "chunkNum": "Number of file chunks",
+                        "chunkSize": "Size of each file chunk"
+                    }
+                }
             }
         },
         "result": {

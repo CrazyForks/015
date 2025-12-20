@@ -1,8 +1,18 @@
+<script setup lang="ts">
+const { t } = useI18n()
+</script>
 <template>
     <div class="flex flex-col gap-2 pt-3">
-        <div class="text-xl font-bold">上传速度如何计算</div>
+        <div class="text-xl font-bold">{{ t('page.progress.file.uploadSpeedInfo.title') }}</div>
         <div class="opacity-75">
-            上传速度根据当前秒上传了 <b>文件区块的数量</b> * <b>每个文件区块的大小</b> 估算而来，可能与真实上传速度有一定的误差，仅供参考
+            <i18n-t keypath="page.progress.file.uploadSpeedInfo.desc.base">
+                <template #chunkNum>
+                    <b>{{ t('page.progress.file.uploadSpeedInfo.desc.chunkNum') }}</b>
+                </template>
+                <template #chunkSize>
+                    <b>{{ t('page.progress.file.uploadSpeedInfo.desc.chunkSize') }}</b>
+                </template>
+            </i18n-t>
         </div>
     </div>
 </template>
