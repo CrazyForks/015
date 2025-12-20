@@ -112,10 +112,15 @@ watch(
             <div class="rounded-xl flex flex-col bg-white/70 px-3 py-2 gap-1 basis-2/3">
                 <div class="text-sm font-semibold">总大小</div>
                 <div class="text-2xl font-light flex flex-row items-center gap-1">
-                    <span class="opacity-75">{{ filesize(totalSize.oldSize) }}</span>
+                    <span v-if="totalSize.oldSize > 0" class="opacity-75">{{ filesize(totalSize.oldSize) }}</span>
+                    <span v-else><Skeleton class="w-12 h-10" /></span>
                     <LucideChevronsRight class="size-6" />
-                    <span>{{ filesize(totalSize.newSize) }}</span>
-                    <div class="rounded flex flex-row items-center bg-green-100 text-green-600 p-1 py-0.5 text-sm">
+                    <span v-if="totalSize.newSize > 0">{{ filesize(totalSize.newSize) }}</span>
+                    <span v-else><Skeleton class="w-12 h-10" /></span>
+                    <div
+                        v-if="totalSize.oldSize > 0 && totalSize.newSize > 0"
+                        class="rounded flex flex-row items-center bg-green-100 text-green-600 p-1 py-0.5 text-sm"
+                    >
                         <LucideArrowDown class="size-4" />
                         {{ ((1 - totalSize.newSize / totalSize.oldSize) * 100).toFixed(2) }}%
                     </div>
