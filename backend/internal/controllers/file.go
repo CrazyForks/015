@@ -5,10 +5,9 @@ import (
 	"backend/internal/utils"
 	"encoding/json"
 	"errors"
-	"fmt"
+	"math"
 	"mime/multipart"
 	"os"
-	"path/filepath"
 	"pkg/models"
 	u "pkg/utils"
 	"time"
@@ -28,9 +27,20 @@ func CreateUploadTask(c echo.Context) error {
 		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
 	}
 	fileId := utils.GetFileId(r.FileHash, r.FileSize)
-	fileInfo, _ := models.GetRedisFileInfo(fileId)
+	fileInfo, err := models.GetRedisFileInfo(fileId)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	if fileInfo != nil {
+		uploadPath, err := utils.GetUploadDirPath()
+		if err != nil {
+			return utils.HTTPErrorHandler(c, err)
+		}
+		sliceList, err := services.GetFileSliceList(fileId, uploadPath)
+		if err != nil {
+			return utils.HTTPErrorHandler(c, err)
+		}
 		return utils.HTTPSuccessHandler(c, map[string]any{
 			"size":       fileInfo.FileSize,
 			"mime_type":  fileInfo.MimeType,
@@ -39,6 +49,7 @@ func CreateUploadTask(c echo.Context) error {
 			"expire":     fileInfo.Expire,
 			"id":         fileId,
 			"chunk_size": fileInfo.ChunkSize,
+			"chunks":     sliceList,
 		})
 	}
 	maxStorageSize, err := utils.GetFileSize(u.GetEnv("upload.maximum"))
@@ -155,7 +166,7 @@ func UploadFileSlice(c echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	if err := services.CreateFileSlice(file, uploadPath, r.FileId, r.FileIndex); err != nil {
+	if _, err := services.CreateFileSlice(r.FileId, uploadPath, file, r.FileIndex); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
@@ -192,13 +203,23 @@ func FinishUploadTask(c echo.Context) error {
 		return utils.HTTPErrorHandler(c, errors.New("上传任务已过期"))
 	}
 
-	// 合并文件切片
-	uploadPath, _ := utils.GetUploadDirPath()
-	slicesPath := filepath.Join(uploadPath, fmt.Sprintf("%s_%s", r.FileId, "tmp"))
+	uploadPath, err := utils.GetUploadDirPath()
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
+
+	fileSliceList, err := services.GetFileSliceList(r.FileId, uploadPath)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
+
+	if len(fileSliceList) != int(math.Ceil(float64(fileInfo.FileSize)/float64(fileInfo.ChunkSize))) {
+		return utils.HTTPErrorHandler(c, errors.New("文件切片不完整"))
+	}
 
 	// 最终合并后的文件路径
-	mergeFilePath := filepath.Join(uploadPath, r.FileId)
-	if err := services.MergeFileSlices(slicesPath, mergeFilePath); err != nil {
+	mergeFilePath, err := services.MergeFileSlices(r.FileId, uploadPath)
+	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
