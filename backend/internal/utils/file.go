@@ -37,12 +37,14 @@ func GetFileMd5(file io.Reader) (string, error) {
 }
 
 func GetUploadDirPath() (string, error) {
-	basepath, err := os.Getwd()
-	if err != nil {
-		return "", err
+	uploadPath := utils.GetEnv("upload.path")
+	if uploadPath == "" {
+		basepath, err := os.Getwd()
+		if err != nil {
+			return "", err
+		}
+		uploadPath = filepath.Join(basepath, "uploads")
 	}
-	finalPath := filepath.Join(basepath, "uploads")
-	uploadPath := utils.GetEnvWithDefault("upload.path", finalPath)
 	if err := os.MkdirAll(uploadPath, 0755); err != nil {
 		return "", err
 	}

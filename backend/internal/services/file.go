@@ -1,7 +1,6 @@
 package services
 
 import (
-	"backend/internal/utils"
 	"fmt"
 	"io"
 	"os"
@@ -9,12 +8,7 @@ import (
 	"strconv"
 )
 
-func CreateFileSlice(fileSlice io.Reader, fileId string, fileIndex int64) error {
-	uploadPath, err := utils.GetUploadDirPath()
-	if err != nil {
-		return err
-	}
-
+func CreateFileSlice(fileSlice io.Reader, uploadPath string, fileId string, fileIndex int64) error {
 	filePath := filepath.Join(uploadPath, fmt.Sprintf("%s_%s", fileId, "tmp"))
 	if err := os.MkdirAll(filePath, 0755); err != nil {
 		return err

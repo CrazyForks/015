@@ -150,7 +150,12 @@ func UploadFileSlice(c echo.Context) error {
 	}
 	defer file.Close()
 
-	if err := services.CreateFileSlice(file, r.FileId, r.FileIndex); err != nil {
+	uploadPath, err := utils.GetUploadDirPath()
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
+
+	if err := services.CreateFileSlice(file, uploadPath, r.FileId, r.FileIndex); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
