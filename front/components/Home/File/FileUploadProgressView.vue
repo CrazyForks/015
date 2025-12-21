@@ -231,6 +231,7 @@ const handleCreate = async (fileId: string) => {
             id: string
             type: 'init' | 'already'
             chunk_size: number
+            chunks: number[]
         }
     }>('/api/file/create', {
         method: 'POST',
@@ -240,10 +241,10 @@ const handleCreate = async (fileId: string) => {
             hash,
         },
     })
-    const { id, chunk_size, type: createType } = createData?.data || {}
+    const { id, chunk_size, type: createType, chunks } = createData?.data || {}
     uploadfile.id = id
     uploadfile.uploadInfo = {
-        chunks: {},
+        chunks: Object.fromEntries(chunks.map((index: number) => [index - 1, { status: 'success', createdAt: dayjs().unix() }])),
         chunkLength: Math.ceil(size / chunk_size),
         ChunkSize: chunk_size,
     }
