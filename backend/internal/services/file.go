@@ -31,7 +31,7 @@ func CreateFileSlice(fileId string, uploadPath string, fileSlice io.Reader, file
 func GetFileSliceList(fileId string, uploadPath string) ([]int, error) {
 	slicesPath := filepath.Join(uploadPath, fmt.Sprintf("%s_%s", fileId, "tmp"))
 	files, err := os.ReadDir(slicesPath)
-	if err != nil {
+	if err != nil && !os.IsNotExist(err) {
 		return nil, fmt.Errorf("读取切片目录失败: %v", err)
 	}
 	fileSliceList := []int{}
