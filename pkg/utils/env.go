@@ -19,15 +19,15 @@ func InitEnv(props EnvOption) {
 	}
 	envOnce.Do(func() {
 		v = viper.New()
+		for _, viperConfigType := range props.ConfigType {
+			v.SetConfigType(viperConfigType)
+		}
 		if props.ConfigData != nil {
 			v.ReadConfig(props.ConfigData)
 			return
 		}
 		for _, name := range props.ConfigName {
 			v.SetConfigName(name)
-		}
-		for _, viperConfigType := range props.ConfigType {
-			v.SetConfigType(viperConfigType)
 		}
 		v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
 		for _, path := range props.ConfigPath {
