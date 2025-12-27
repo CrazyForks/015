@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"testing"
 
+	"backend/internal/utils"
+
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
 )
@@ -17,7 +19,7 @@ func TestHTTPSuccessHandler(t *testing.T) {
 	c := e.NewContext(req, rec)
 
 	data := map[string]interface{}{"result": "success"}
-	err := HTTPSuccessHandler(c, data)
+	err := utils.HTTPSuccessHandler(c, data)
 	assert.NoError(t, err)
 
 	assert.Equal(t, http.StatusOK, rec.Code)
@@ -40,7 +42,7 @@ func TestHTTPErrorHandler(t *testing.T) {
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
 
-	err := HTTPErrorHandler(c, assert.AnError)
+	err := utils.HTTPErrorHandler(c, assert.AnError)
 	assert.NoError(t, err)
 
 	assert.Equal(t, http.StatusBadRequest, rec.Code)

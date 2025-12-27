@@ -1,30 +1,31 @@
 package utils
 
 import (
-	"os"
+	"bytes"
+	"fmt"
 	"testing"
+
+	"backend/internal/utils"
+	u "pkg/utils"
 
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGeneratePasswordHash(t *testing.T) {
-	// 保存原始环境变量
-	originalSalt := os.Getenv("share.password_salt")
-	defer os.Setenv("share.password_salt", originalSalt)
 
 	tests := []struct {
 		name        string
 		password    string
 		salt        string
 		expectError bool
-		errorMsg    string
+		err         error
 	}{
 		{
 			name:        "share.password_salt未配置",
 			password:    "testpassword",
 			salt:        "",
 			expectError: true,
-			errorMsg:    "请配置share.password_salt",
+			err:         utils.ErrPasswordSaltNotSet,
 		},
 		{
 			name:        "正常生成哈希",
@@ -37,21 +38,23 @@ func TestGeneratePasswordHash(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// 设置环境变量
-			if tt.salt != "" {
-				os.Setenv("share.password_salt", tt.salt)
-			} else {
-				os.Unsetenv("share.password_salt")
-			}
+			u.InitEnv(u.EnvOption{
+				ConfigData: bytes.NewBuffer([]byte(fmt.Sprintf(`
+				share:
+					password_salt: %s
+				`, tt.salt))),
+			})
+			u.SetEnv("share.password_salt", tt.salt)
 
-			hash, err := GeneratePasswordHash(tt.password)
+			hash, err := utils.GeneratePasswordHash(tt.password)
 
 			if tt.expectError {
 				if err == nil {
 					t.Errorf("期望错误，但得到了 nil")
 					return
 				}
-				if err.Error() != tt.errorMsg {
-					t.Errorf("期望错误信息 '%s'，但得到了 '%s'", tt.errorMsg, err.Error())
+				if err != tt.err {
+					t.Errorf("期望错误信息 '%s'，但得到了 '%s'", tt.err.Error(), err.Error())
 				}
 				return
 			}
