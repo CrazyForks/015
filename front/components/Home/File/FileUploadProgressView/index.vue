@@ -1,23 +1,12 @@
 <script setup lang="ts">
-import {
-    LucidePlay,
-    LucideSettings,
-    LucideSquare,
-    LucideInfo,
-    LucideFolders,
-    LucideArrowUpFromLine,
-    LucideCircleX,
-    LucideCheckCircle,
-    LucideLoaderCircle,
-    LucideArrowDownUp,
-} from 'lucide-vue-next'
+import { LucideSquare, LucideInfo, LucideFolders, LucideArrowUpFromLine, LucideCircleX, LucideCheckCircle, LucideLoaderCircle } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
 
 import getFileSize from '~/lib/getFileSize'
 import { cx } from 'class-variance-authority'
 import asyncWorker from '@/lib/asyncWorker'
 import calcFileHashWorker from '@/lib/calcFileHashWorker?worker'
-import { clamp, debounce, get, groupBy, isEmpty, isNumber, isString, sample, shuffle, throttle, times } from 'lodash-es'
+import { clamp, get, isEmpty, isNumber, sample, shuffle, throttle, times } from 'lodash-es'
 import { nanoid } from 'nanoid'
 import { toast } from 'vue-sonner'
 import dayjs from 'dayjs'
@@ -28,6 +17,7 @@ import FileUploadSpeedInfoView from './FileUploadSpeedInfoView.vue'
 import getFileChunk from '~/lib/getFileChunk'
 import type { FileHandleKey } from '~/components/Preprocessing/types'
 import asyncWait from '@/lib/asyncWait'
+import axios from 'axios'
 import type { SelectedFile, Uploadfile } from './types'
 import FileUploadDetailView from './FileUploadDetailView.vue'
 
@@ -48,48 +38,7 @@ const activeTaskList = computed(() => uploadfiles.value.filter((r) => r.queue.le
 const activeTaskAllQueue = computed(() => activeTaskList.value.flatMap((r) => r.queue))
 const batchNum = ref(3)
 
-const totalTaskStatus = computed(() => {
-    if (uploadfiles.value.some((r) => r.status === 'start')) {
-        return 'start'
-    }
-    if (uploadfiles.value.some((r) => r.status === 'pause')) {
-        return 'pause'
-    }
-    return 'disabled'
-})
-const totalUploadProgress = computed(() => {
-    const successCount = uploadfiles.value.reduce((acc, curr) => {
-        const { status, uploadInfo } = curr || {}
-        if (status === 'finish') return acc
-        const { chunks } = uploadInfo || {}
-        return acc + Object.entries(chunks || {}).filter(([index, chunk]) => chunk.status === 'success').length
-    }, 0)
-    const totalCount = uploadfiles.value.reduce((acc, curr) => {
-        const { status, uploadInfo } = curr || {}
-        if (status === 'finish') return acc
-        const { chunkLength } = uploadInfo || {}
-        return acc + (chunkLength || 0)
-    }, 0)
-    return ((successCount || 0) / (totalCount || 0)) * 100
-})
-
-const counter = useInterval(1000)
-const speedChartData = ref<Record<number, { createdAt: number; value: number }[]>>({})
-watch(counter, () => {
-    const speed = uploadfiles.value?.flatMap((item) => {
-        const { chunks, ChunkSize } = item?.uploadInfo || {}
-        return Object.entries(chunks || {})
-            .filter(([index, chunk]) => chunk.status === 'success' && dayjs().unix() - 60 < chunk.createdAt)
-            ?.map(([index, chunk]) => {
-                const { createdAt } = chunk || {}
-                return {
-                    createdAt,
-                    value: ChunkSize || 0,
-                }
-            })
-    })
-    speedChartData.value = groupBy(speed, 'createdAt')
-})
+const speedChartData = ref<Record<number, { fileId: string; index: number; value: number }[]>>({})
 
 onMounted(() => {
     props.data.file.forEach((file) => {
@@ -269,11 +218,12 @@ const handleUpload = async (fileId: string, index: number) => {
     formData.append('file', new Blob([chunk]))
     formData.append('index', (index + 1).toString())
     formData.append('id', id)
-    const res = await $fetch<{
-        code: number
-    }>('/api/file/slice', {
-        method: 'POST',
-        body: formData,
+    const { data: res } = await axios.post('/api/file/slice', formData, {
+        onUploadProgress: throttle((progressEvent) => {
+            const { rate } = progressEvent || {}
+            const timestamp = dayjs().unix()
+            speedChartData.value[timestamp] = [...(speedChartData.value[timestamp] || []), { fileId, index, value: rate || 0 }]
+        }, 1000),
     })
     const { code } = res || {}
     if (code !== 200) {
@@ -334,7 +284,7 @@ const handleShowSpeedInfo = () => {
 
 <template>
     <div class="grid grid-cols-4 gap-5">
-        <FileUploadTotalSpeedView :speedChartData="throttledSpeedChartData" />
+        <FileUploadTotalSpeedView :speedChartData="speedChartData" />
         <FileUploadTotalProgressControlView :uploadfiles="uploadfiles" />
         <div class="col-span-4 flex flex-col bg-white/80 rounded-xl p-3 text-md gap-5">
             <div class="flex flex-row gap-2 items-center">
@@ -394,15 +344,15 @@ const handleShowSpeedInfo = () => {
                     </div>
                     <div>{{ getFileSize(item?.file?.size) }}</div>
                     <div>
-                        {{
-                            `${getFileSize(
-                                (Object.entries(item?.uploadInfo?.chunks || {})?.filter(
-                                    ([, chunk]) => chunk.status === 'success' && dayjs().unix() - 60 < chunk.createdAt
-                                )?.length /
-                                    60) *
-                                    (item?.uploadInfo?.ChunkSize || 0)
-                            )} /s`
-                        }}
+                        <template v-if="item?.status === 'start' && item?.procressType === 'upload'">
+                            {{
+                                `${getFileSize(
+                                    Object.entries(speedChartData)
+                                        ?.filter(([key, value]) => value.some((r) => r.fileId === item?.fileId) && dayjs().unix() - 1 === Number(key))
+                                        ?.reduce((acc, curr) => acc + curr[1]?.reduce((acc, curr) => acc + curr.value, 0), 0) ?? 0
+                                )} /s`
+                            }}
+                        </template>
                     </div>
                     <div
                         class="flex flex-row gap-2 items-center col-span-3 md:col-span-1"
