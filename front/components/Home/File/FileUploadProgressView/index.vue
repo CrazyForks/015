@@ -12,22 +12,24 @@ import {
     LucideArrowDownUp,
 } from 'lucide-vue-next'
 import Button from '@/components/ui/button/Button.vue'
-import FileUploadBlockProgressView from '@/components/FileUploadBlockProgressView.vue'
-import FileUploadHeatMapView from '@/components/FileUploadHeatMapView.vue'
-import { motion } from 'motion-v'
+
 import getFileSize from '~/lib/getFileSize'
 import { cx } from 'class-variance-authority'
 import asyncWorker from '@/lib/asyncWorker'
 import calcFileHashWorker from '@/lib/calcFileHashWorker?worker'
-import { clamp, get, groupBy, isEmpty, isNumber, isString, sample, shuffle, times } from 'lodash-es'
+import { clamp, debounce, get, groupBy, isEmpty, isNumber, isString, sample, shuffle, throttle, times } from 'lodash-es'
 import { nanoid } from 'nanoid'
 import { toast } from 'vue-sonner'
 import dayjs from 'dayjs'
 import showDrawer from '~/lib/showDrawer'
+import FileUploadTotalSpeedView from './FileUploadTotalSpeedView.vue'
+import FileUploadTotalProgressControlView from './FileUploadTotalProgressControlView.vue'
 import FileUploadSpeedInfoView from './FileUploadSpeedInfoView.vue'
 import getFileChunk from '~/lib/getFileChunk'
 import type { FileHandleKey } from '~/components/Preprocessing/types'
 import asyncWait from '@/lib/asyncWait'
+import type { SelectedFile, Uploadfile } from './types'
+import FileUploadDetailView from './FileUploadDetailView.vue'
 
 const props = defineProps<{
     data: { file: File[]; config: Record<string, any>; handle_type: FileHandleKey }
@@ -38,32 +40,8 @@ const emit = defineEmits<{
 const form = useFormContext()
 const { t } = useI18n()
 
-const selectedFile = ref()
-const uploadfiles = ref<
-    {
-        fileId: string
-        id?: string // 后端文件id
-        file: File
-        status: 'start' | 'pause' | 'finish' | 'error'
-        hash?: string
-        procressType: 'hash' | 'create' | 'upload' | 'finish'
-        uploadInfo?: {
-            chunks: Record<number, { status: 'success' | 'error' | 'processing'; createdAt: number }>
-            chunkLength: number
-            ChunkSize: number
-        }
-        queue: {
-            taskId: string
-            taskType: 'hash' | 'create' | 'chunk' | 'upload' | 'finish'
-            queueType: 'sync' | 'async' // sync任务禁止并发
-            index?: number
-            retry?: number
-        }[]
-    }[]
->([])
-const selectedUploadfile = computed(() => uploadfiles.value.find((item) => item.fileId === selectedFile.value))
-const selectedUploadfileChunk = computed(() => Object.values(selectedUploadfile.value?.uploadInfo?.chunks || {}))
-const selectedUploadfileViewMode = ref<'progress' | 'heatmap'>('progress')
+const selectedFile = ref<SelectedFile>(null)
+const uploadfiles = ref<Uploadfile[]>([])
 
 const procressTaskList = ref<Map<string, any>>(new Map())
 const activeTaskList = computed(() => uploadfiles.value.filter((r) => r.queue.length > 0 && r.status === 'start'))
@@ -152,7 +130,7 @@ const { error, execute, isLoading } = useAsyncState(
                             toast.error(t('page.progress.file.uploadError'), {
                                 description: t('page.progress.file.chunkUploadFailed', [file?.file?.name, index]),
                             })
-                            uploadfiles.value[uploadFileIndex].status = 'error'
+                            uploadfiles.value[uploadFileIndex]!.status = 'error'
                             return
                         }
                         uploadfiles.value[uploadFileIndex]?.queue.shift()
@@ -188,7 +166,7 @@ const { error, execute, isLoading } = useAsyncState(
                             })
                         }
                         if (queueType === 'sync') {
-                            uploadfiles.value[uploadFileIndex].status = 'error'
+                            uploadfiles.value[uploadFileIndex]!.status = 'error'
                             toast.error(t('page.progress.file.uploadError'), {
                                 description: t('page.progress.file.fileUploadFailed', [file?.file?.name]),
                             })
@@ -301,7 +279,7 @@ const handleUpload = async (fileId: string, index: number) => {
     if (code !== 200) {
         throw new Error(t('page.progress.file.uploadFailed'))
     }
-    uploadfile.uploadInfo!.chunks[index].status = 'success'
+    uploadfile.uploadInfo!.chunks![index]!.status = 'success'
     if (Object.entries(uploadfile.uploadInfo!.chunks || {}).filter(([index, chunk]) => chunk.status === 'success').length === chunkLength) {
         uploadfile.queue.push({ taskType: 'finish', queueType: 'sync', taskId: nanoid() })
     }
@@ -356,84 +334,8 @@ const handleShowSpeedInfo = () => {
 
 <template>
     <div class="grid grid-cols-4 gap-5">
-        <div class="rounded-xl p-3 bg-white/80 flex flex-col gap-2 col-span-4 md:col-span-3 h-32 md:h-auto">
-            <div class="flex flex-col gap-1">
-                <div @click="handleShowSpeedInfo" class="flex flex-row gap-1 items-center text-xs opacity-70">
-                    {{ t('page.progress.file.totalUploadProgress') }}
-                    <LucideInfo class="size-3" />
-                </div>
-                <div class="text-2xl font-bold">
-                    {{
-                        `${
-                            getFileSize(
-                                Object.entries(speedChartData)
-                                    ?.filter((r) => dayjs().unix() - 60 < parseInt(r[0]))
-                                    ?.reduce((acc, curr) => acc + curr[1]?.reduce((_acc, _curr) => _acc + _curr.value, 0), 0) / 60
-                            ) ?? 0
-                        }/s`
-                    }}
-                </div>
-            </div>
-            <div class="flex-1 relative overflow-hidden flex flex-row gap-0.5 justify-end items-end">
-                <motion.div
-                    class="w-2 shrink-0 bg-primary relative"
-                    :style="{
-                        height: `${(i[1]?.reduce((acc, curr) => acc + curr.value, 0) / Math.max(...Object.entries(speedChartData)?.map((r) => r[1]?.reduce((acc, curr) => acc + curr.value, 0)))) * 100}%`,
-                    }"
-                    :layoutId="i[0]"
-                    v-for="i in Object.entries(speedChartData)"
-                    :key="i[0]"
-                    :initial="{ x: 10, opacity: 0 }"
-                    :animate="{ x: 0, opacity: 1 }"
-                    :transition="{ duration: 1 }"
-                >
-                </motion.div>
-                <!-- <BarChart class="h-full" :data="data" index="time" :categories="['value']" :showTooltip="false"
-            :showLegend="false" :showXAxis="false" :showYAxis="false" :showGrid="false" :groupMaxWidth="10" /> -->
-            </div>
-        </div>
-        <div class="rounded-xl col-span-4 md:col-span-1 bg-white/80 h-32 md:h-auto md:aspect-square flex flex-col gap-2 relative overflow-hidden">
-            <div class="absolute top-0 left-0 w-full h-full z-[0] flex flex-col justify-end">
-                <div class="w-full bg-green-100 border-t border-green-500" :style="`height: ${totalUploadProgress || 0}%`"></div>
-            </div>
-            <div class="flex flex-col gap-2 justify-between p-3 h-full relative z-[1]">
-                <div class="flex flex-col gap-1">
-                    <div class="text-xs opacity-70">{{ t('page.progress.file.totalUploadProgress') }}</div>
-                    <div class="text-4xl font-bold">{{ (totalUploadProgress || 0).toFixed(1) }}%</div>
-                </div>
-                <div class="flex flex-row gap-2">
-                    <Button
-                        class="aspect-square hover:text-white p-0 bg-green-200 hover:bg-green-300 text-green-500"
-                        :disabled="['start', 'disabled'].includes(totalTaskStatus)"
-                        @click="
-                            () => {
-                                uploadfiles.forEach((r) => {
-                                    r.status = 'start'
-                                })
-                            }
-                        "
-                    >
-                        <LucidePlay class="size-1/2" />
-                    </Button>
-                    <Button
-                        class="aspect-square hover:text-white p-0 bg-orange-200 hover:bg-orange-300 text-orange-500"
-                        :disabled="['pause', 'disabled'].includes(totalTaskStatus)"
-                        @click="
-                            () => {
-                                uploadfiles.forEach((r) => {
-                                    r.status = 'pause'
-                                })
-                            }
-                        "
-                    >
-                        <LucideSquare class="size-1/2" />
-                    </Button>
-                    <!-- <Button class="aspect-square bg-blue-200 hover:bg-blue-300 text-blue-500 hover:text-white p-0">
-                        <LucideSettings class="size-1/2" />
-                    </Button> -->
-                </div>
-            </div>
-        </div>
+        <FileUploadTotalSpeedView :speedChartData="throttledSpeedChartData" />
+        <FileUploadTotalProgressControlView :uploadfiles="uploadfiles" />
         <div class="col-span-4 flex flex-col bg-white/80 rounded-xl p-3 text-md gap-5">
             <div class="flex flex-row gap-2 items-center">
                 <LucideFolders class="size-4" />
@@ -476,9 +378,9 @@ const handleShowSpeedInfo = () => {
                                 (e: Event) => {
                                     e.stopPropagation()
                                     if (item?.status === 'start') {
-                                        uploadfiles[index].status = 'pause'
+                                        uploadfiles[index]!.status = 'pause'
                                     } else {
-                                        uploadfiles[index].status = 'start'
+                                        uploadfiles[index]!.status = 'start'
                                     }
                                 }
                             "
@@ -543,50 +445,6 @@ const handleShowSpeedInfo = () => {
                 </div>
             </div>
         </div>
-        <div class="col-span-4 flex flex-col bg-white/80 rounded-xl p-3 gap-5" v-if="selectedFile">
-            <div class="flex flex-row gap-2 items-center">
-                <LucideInfo class="size-4" />
-                {{ t('page.progress.file.uploadDetails') }}
-            </div>
-            <div class="grid grid-cols-3 text-sm gap-3">
-                <div>
-                    {{ t('page.progress.file.chunk') }}: {{ selectedUploadfile?.uploadInfo?.chunkLength }} x
-                    {{ getFileSize(selectedUploadfile?.uploadInfo?.ChunkSize as number) }}
-                </div>
-                <div class="truncate col-span-2">Hash: {{ selectedUploadfile?.hash }}</div>
-                <div>{{ t('page.progress.file.completed') }}: {{ selectedUploadfileChunk?.filter((r) => r.status === 'success')?.length || 0 }}</div>
-                <div>{{ t('page.progress.file.discarded') }}: {{ selectedUploadfileChunk?.filter((r) => r.status === 'error')?.length || 0 }}</div>
-                <div>
-                    {{ t('page.progress.file.pending') }}:
-                    {{ (selectedUploadfile?.uploadInfo?.chunkLength || 0) - (selectedUploadfileChunk?.length || 0) }}
-                </div>
-                <div class="col-span-3 flex flex-row justify-between items-center">
-                    <div class="text-md font-bold">
-                        {{ selectedUploadfileViewMode === 'progress' ? t('page.progress.file.chunkProgress') : t('page.progress.file.chunkHeatmap') }}
-                    </div>
-                    <Button
-                        size="sm"
-                        class="ml-auto text-xs"
-                        @click="selectedUploadfileViewMode = selectedUploadfileViewMode === 'progress' ? 'heatmap' : 'progress'"
-                    >
-                        <LucideArrowDownUp class="size-4" />
-                        {{ selectedUploadfileViewMode === 'progress' ? t('page.progress.file.heatmap') : t('page.progress.file.progressBar') }}
-                    </Button>
-                </div>
-                <div class="h-7 col-span-3 flex flex-row gap-2 items-center" v-if="selectedUploadfileViewMode === 'progress'">
-                    <div class="flex-1 h-full">
-                        <FileUploadBlockProgressView :data="selectedUploadfile?.uploadInfo" />
-                    </div>
-                    {{
-                        clamp(((selectedUploadfileChunk?.length || 0) / (selectedUploadfile?.uploadInfo?.chunkLength || 0)) * 100, 0, 100)?.toFixed(
-                            2
-                        )
-                    }}%
-                </div>
-                <div v-if="selectedUploadfileViewMode === 'heatmap'" class="col-span-3 bg-black/5 rounded p-2">
-                    <FileUploadHeatMapView :size="12" :data="selectedUploadfile?.uploadInfo" />
-                </div>
-            </div>
-        </div>
+        <FileUploadDetailView :uploadfiles="uploadfiles" :selectedFile="selectedFile" />
     </div>
 </template>
