@@ -12,7 +12,12 @@
         "lint:front": "cd front && pnpm nuxt typecheck",
         "lint:backend": "cd backend && golangci-lint run",
         "lint:worker": "cd worker && golangci-lint run",
-        "prepare": "husky"
+        "prepare": "husky",
+        "up-deps": "concurrently -n backend,worker,models,utils -c green,yellow,blue,magenta 'pnpm:up-deps:backend' 'pnpm:up-deps:worker' 'pnpm:up-deps:models' 'pnpm:up-deps:utils'",
+        "up-deps:backend": "cd backend && go get -u",
+        "up-deps:worker": "cd worker && go get -u",
+        "up-deps:models": "cd pkg/models && go get -u",
+        "up-deps:utils": "cd pkg/utils && go get -u"
     },
     "workspaces": [
         "front"
@@ -33,6 +38,6 @@
         "concurrently": "^9.2.1",
         "husky": "^9.1.7",
         "lint-staged": "^15.5.2",
-        "prettier": "^3.6.2"
+        "prettier": "^3.8.1"
     }
 }
