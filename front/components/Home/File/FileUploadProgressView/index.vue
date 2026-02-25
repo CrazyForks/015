@@ -168,7 +168,7 @@ const handleCreate = async (fileId: string) => {
             hash,
         },
     })
-    const { id, chunk_size, type: createType, chunks } = createData?.data || {}
+    const { id, chunk_size, type: createType, chunks = [] } = createData?.data || {}
     uploadfile.id = id
     uploadfile.uploadInfo = {
         chunks: Object.fromEntries(chunks.map((index: number) => [index - 1, { status: 'success', createdAt: dayjs().unix() }])),
