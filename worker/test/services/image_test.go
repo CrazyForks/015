@@ -36,7 +36,7 @@ func TestCompressPNGHappyPath(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotEqual(t, origInfo.Size(), compInfo.Size())
-	fmt.Printf("原图: %d | 压缩后: %d | 压缩率: %f%%\n", origInfo.Size(), compInfo.Size(), float64(origInfo.Size())/float64(compInfo.Size())*100)
+	fmt.Printf("原图: %d | 压缩后: %d | 压缩率: %f%%\n", origInfo.Size(), compInfo.Size(), float64(compInfo.Size())/float64(origInfo.Size())*100)
 }
 
 func TestCompressJPEGHappyPath(t *testing.T) {
@@ -62,5 +62,5 @@ func TestCompressJPEGHappyPath(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotEqual(t, origInfo.Size(), compInfo.Size())
-	fmt.Printf("原图: %d | 压缩后: %d | 压缩率: %f%%\n", origInfo.Size(), compInfo.Size(), float64(origInfo.Size())/float64(compInfo.Size())*100)
+	fmt.Printf("原图: %d | 压缩后: %d | 压缩率: %f%%\n", origInfo.Size(), compInfo.Size(), float64(compInfo.Size())/float64(origInfo.Size())*100)
 }

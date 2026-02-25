@@ -2,7 +2,6 @@ package services
 
 import (
 	"errors"
-	"os/exec"
 	"worker/internal/utils"
 )
 
@@ -10,9 +9,7 @@ func CompressImage(filePath string, mimeType string) (string, error) {
 	compressedPath := filePath + "_compressed"
 	switch mimeType {
 	case "image/png":
-		args := []string{"--output", compressedPath, filePath}
-		cmd := exec.Command("pngquant", args...)
-		_, err := cmd.CombinedOutput()
+		_, err := utils.RunCommand("pngquant", "--output", compressedPath, filePath)
 		if err != nil {
 			return "", err
 		}
@@ -21,9 +18,7 @@ func CompressImage(filePath string, mimeType string) (string, error) {
 		if err != nil {
 			return "", err
 		}
-		args := []string{"-m", "90", "--strip-all", compressedPath}
-		cmd := exec.Command("jpegoptim", args...)
-		_, err = cmd.CombinedOutput()
+		_, err = utils.RunCommand("jpegoptim", "-m", "80", "--strip-all", compressedPath)
 		if err != nil {
 			return "", err
 		}
