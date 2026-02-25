@@ -4,8 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"os/exec"
 	"path/filepath"
 	"pkg/models"
 	"worker/internal/services"
@@ -13,14 +11,6 @@ import (
 
 	"github.com/hibiken/asynq"
 )
-
-type ImageTaskPayload struct {
-	FileId string `json:"file_id"`
-}
-
-type CompressImageTaskPayload struct {
-	ImageTaskPayload
-}
 
 func CompressImage(ctx context.Context, task *asynq.Task) error {
 	var payload CompressImageTaskPayload
@@ -36,29 +26,10 @@ func CompressImage(ctx context.Context, task *asynq.Task) error {
 		return err
 	}
 	originalPath := filepath.Join(uploadPath, payload.FileId)
-	switch originalFileInfo.MimeType {
-	case "image/png":
-		args := []string{"--output", originalPath + "_compressed", originalPath}
-		cmd := exec.Command("pngquant", args...)
-		_, err := cmd.CombinedOutput()
-		if err != nil {
-			return err
-		}
-	case "image/jpeg":
-		err := utils.CopyFile(originalPath, originalPath+"_compressed")
-		if err != nil {
-			return err
-		}
-		args := []string{"-m", "90", "--strip-all", originalPath + "_compressed"}
-		cmd := exec.Command("jpegoptim", args...)
-		_, err = cmd.CombinedOutput()
-		if err != nil {
-			return err
-		}
-	default:
-		return errors.New("不支持的文件类型")
+	compressedPath, err := services.CompressImage(originalPath, originalFileInfo.MimeType)
+	if err != nil {
+		return err
 	}
-	compressedPath := fmt.Sprintf("%s_compressed", originalPath)
 	compressedFileInfo, err := services.GenStandardFile(compressedPath, originalFileInfo.MimeType)
 	if err != nil {
 		return err

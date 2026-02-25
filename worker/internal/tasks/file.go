@@ -12,12 +12,7 @@ import (
 	"github.com/hibiken/asynq"
 )
 
-type RemoveFileTaskPayload struct {
-	FileId string `json:"file_id"`
-}
-
 func RemoveFile(ctx context.Context, task *asynq.Task) error {
-
 	var payload RemoveFileTaskPayload
 	if err := json.Unmarshal(task.Payload(), &payload); err != nil {
 		return err
