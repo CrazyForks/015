@@ -58,5 +58,5 @@ onUnmounted(() => {
         "
     >
     </editor-content>
-    <BubbleMenuView :editor="editor as any" />
+    <!-- <BubbleMenuView :editor="editor as any" /> -->
 </template>
