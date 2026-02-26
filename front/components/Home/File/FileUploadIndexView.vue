@@ -28,16 +28,14 @@ watch(
 </script>
 <template>
     <VeeForm ref="formRef" v-slot="{ values }" :keepValues="true">
-        <div class="rounded-xl p-5 bg-white/50 backdrop-blur-xl w-full lg:w-200">
-            <component
-                :is="renderComponent"
-                :data="values"
-                @change="
-                    (key: string) => {
-                        step = key
-                    }
-                "
-            />
-        </div>
+        <component
+            :is="renderComponent"
+            :data="values"
+            @change="
+                (key: string) => {
+                    step = key
+                }
+            "
+        />
     </VeeForm>
 </template>

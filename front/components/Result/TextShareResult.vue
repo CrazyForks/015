@@ -42,7 +42,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-    <div class="flex flex-col gap-3">
+    <BaseCard class="flex flex-col gap-3" :title="t('page.result.text.title')">
         <div class="flex flex-row gap-2">
             <div class="flex flex-row justify-between w-full">
                 <h2 class="text-lg">{{ t('page.result.text.title') }}</h2>
@@ -140,5 +140,5 @@ const { t } = useI18n()
         </div>
         <h2 class="text-md">{{ t('page.result.text.content') }}</h2>
         <MarkdownRender class="prose rounded-md bg-white/70 p-3 w-full max-w-full min-h-[30vh]" :markdown="props?.data?.text" />
-    </div>
+    </BaseCard>
 </template>

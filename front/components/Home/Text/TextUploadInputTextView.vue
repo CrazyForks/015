@@ -21,8 +21,7 @@ const handleTextShare = ({ type, config }: { type: string; config: any }) => {
 }
 </script>
 <template>
-    <div class="gap-5 flex flex-col">
-        <div class="text-xl font-normal">{{ t('page.upload.text.uploadText') }}</div>
+    <BaseCard class="gap-5 flex flex-col" :title="t('page.upload.text.uploadText')">
         <div class="relative">
             <MarkdownInputField
                 name="text"
@@ -68,5 +67,5 @@ const handleTextShare = ({ type, config }: { type: string; config: any }) => {
             </FormButton>
             <PickupShareBtn />
         </div>
-    </div>
+    </BaseCard>
 </template>

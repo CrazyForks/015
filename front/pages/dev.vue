@@ -19,8 +19,7 @@ if (!isDev) {
 </script>
 
 <template>
-    <div class="rounded-xl p-5 bg-white/50 backdrop-blur-xl w-full lg:w-200 my-5 flex flex-col gap-5">
-        <h1>Dev</h1>
+    <BaseCard class="my-5 flex flex-col gap-5" title="dev">
         <div class="flex flex-row gap-5 items-center">
             <Button
                 @click="
@@ -74,6 +73,6 @@ if (!isDev) {
             </div>
         </VeeForm>
         <div>测试dayjs语言包渲染:{{ dayjs().add(1, 'day').fromNow() }}</div>
-    </div>
+    </BaseCard>
 </template>
 <style scoped></style>

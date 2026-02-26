@@ -57,8 +57,7 @@ const { copy } = useClipboard()
 </script>
 
 <template>
-    <div class="flex flex-col gap-3">
-        <h2 class="text-lg">{{ t('page.result.file.title') }}</h2>
+    <BaseCard class="flex flex-col gap-3" :title="t('page.result.file.title')">
         <div class="flex flex-col gap-3 items-center">
             <div v-if="data?.length === 1" class="flex flex-col h-30 items-center">
                 <FilePreviewView :value="props?.data?.files?.[0]?.file as File" />
@@ -206,5 +205,5 @@ const { copy } = useClipboard()
                 {{ t('btn.backToHome') }}
             </Button>
         </div>
-    </div>
+    </BaseCard>
 </template>

@@ -29,12 +29,11 @@ const handleFormSubmit = async (form: any) => {
 </script>
 
 <template>
-    <div class="gap-5 flex flex-col">
-        <div class="text-xl font-normal">{{ t('page.upload.file.uploadFile') }}</div>
+    <BaseCard class="gap-5 flex flex-col" :title="t('page.upload.file.uploadFile')">
         <FileUploadField name="file" rules="required" />
         <div class="flex flex-row gap-3">
             <FormButton @click="handleFormSubmit"> <LucideShare class="size-4" />{{ t('btn.submit') }} </FormButton>
             <PickupShareBtn />
         </div>
-    </div>
+    </BaseCard>
 </template>

@@ -23,7 +23,7 @@ const { data, isLoading, error } = useQuery({
         }>(`/api/share/${id.value}`)
         return data?.data
     },
-    retry: false
+    retry: false,
 })
 
 const isExpired = computed(() => {
@@ -33,13 +33,12 @@ const isExpired = computed(() => {
 
 const componentMap = {
     file: FileShareView,
-    text: TextShareView
+    text: TextShareView,
 }
-
 </script>
 
 <template>
-    <div class="rounded-xl p-5 bg-white/50 backdrop-blur-xl w-full lg:w-200 my-5 overflow-hidden">
+    <BaseCard class="my-5 overflow-hidden">
         <div v-if="isLoading" class="flex flex-col gap-5 items-center">
             <Skeleton class="w-20 h-5 rounded-full" />
             <Skeleton class="w-16 h-16 rounded-xl" />
@@ -52,15 +51,19 @@ const componentMap = {
         <template v-else>
             <div v-if="isExpired || !data" class="flex flex-col gap-5 items-center">
                 <LucideAlertCircle :size="48" class="text-orange-500 rounded-full bg-orange-500/30 p-2" />
-                <div class="text-xl ">此链接已过期。</div>
-                <Button @click="() => {
-                    router.push('/')
-                }">返回首页</Button>
+                <div class="text-xl">此链接已过期。</div>
+                <Button
+                    @click="
+                        () => {
+                            router.push('/')
+                        }
+                    "
+                    >返回首页</Button
+                >
             </div>
             <template v-else>
                 <component :is="componentMap[data?.type as keyof typeof componentMap] || 'div'" :data="data" />
             </template>
         </template>
-    </div>
-
+    </BaseCard>
 </template>

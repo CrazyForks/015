@@ -106,8 +106,7 @@ watch(
 )
 </script>
 <template>
-    <div class="flex flex-col gap-3">
-        <h2 class="text-lg">图片压缩</h2>
+    <BaseCard class="flex flex-col gap-3" title="图片压缩">
         <div class="flex flex-row gap-3">
             <div class="rounded-xl flex flex-col bg-white/70 px-3 py-2 gap-1 basis-2/3">
                 <div class="text-sm font-semibold">总大小</div>
@@ -196,5 +195,5 @@ watch(
                 /></AsyncButton>
             </div>
         </div>
-    </div>
+    </BaseCard>
 </template>

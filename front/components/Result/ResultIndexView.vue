@@ -24,8 +24,6 @@ const activeHandle = computed(() => {
 // vue这个ts蠢的没边了，本来想写component: FileShareResult | TextShareResult，结果不行
 </script>
 <template>
-    <div>
-        <component v-if="'files' in data" :is="activeHandle?.component" :data="data" @change="(key: string) => emit('change', key)" />
-        <component v-if="'text' in data" :is="activeHandle?.component" :data="data" @change="(key: string) => emit('change', key)" />
-    </div>
+    <component v-if="'files' in data" :is="activeHandle?.component" :data="data" @change="(key: string) => emit('change', key)" />
+    <component v-if="'text' in data" :is="activeHandle?.component" :data="data" @change="(key: string) => emit('change', key)" />
 </template>

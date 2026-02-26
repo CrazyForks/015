@@ -283,7 +283,7 @@ const handleShowSpeedInfo = () => {
 </script>
 
 <template>
-    <div class="grid grid-cols-4 gap-5">
+    <BaseCard class="grid grid-cols-4 gap-5">
         <FileUploadTotalSpeedView :speedChartData="speedChartData" />
         <FileUploadTotalProgressControlView :uploadfiles="uploadfiles" />
         <div class="col-span-4 flex flex-col bg-white/80 rounded-xl p-3 text-md gap-5">
@@ -396,5 +396,5 @@ const handleShowSpeedInfo = () => {
             </div>
         </div>
         <FileUploadDetailView :uploadfiles="uploadfiles" :selectedFile="selectedFile" />
-    </div>
+    </BaseCard>
 </template>
