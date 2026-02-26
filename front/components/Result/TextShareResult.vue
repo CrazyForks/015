@@ -42,24 +42,7 @@ const { t } = useI18n()
 </script>
 
 <template>
-    <BaseCard class="flex flex-col gap-3" :title="t('page.result.text.title')">
-        <div class="flex flex-row gap-2">
-            <div class="flex flex-row justify-between w-full">
-                <h2 class="text-lg">{{ t('page.result.text.title') }}</h2>
-                <Button
-                    variant="outline"
-                    class="bg-white/70"
-                    size="icon"
-                    @click="
-                        () => {
-                            emit('change', 'input')
-                        }
-                    "
-                >
-                    <LucideHome />
-                </Button>
-            </div>
-        </div>
+    <BaseCard class="flex flex-col gap-3" :title="t('page.result.text.title')" :showBackButton="true">
         <div class="flex flex-col md:flex-row gap-5 rounded-md p-5 bg-white/20 backdrop-blur-xl w-full">
             <div class="flex flex-col gap-2 flex-1">
                 <div class="text-sm font-semibold">{{ t('page.result.text.info') }}</div>

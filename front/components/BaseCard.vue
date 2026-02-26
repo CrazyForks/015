@@ -1,12 +1,29 @@
 <script setup lang="ts">
 const props = defineProps<{
     title?: string
+    showBackButton?: boolean
 }>()
+const router = useRouter()
 </script>
 
 <template>
     <div class="rounded-xl p-5 bg-white/50 backdrop-blur-xl w-full lg:w-200">
-        <div v-if="title" class="text-xl font-normal">{{ title }}</div>
+        <div class="flex flex-row justify-between">
+            <h1 class="text-xl font-normal">{{ title }}</h1>
+            <Button
+                v-if="!!showBackButton"
+                variant="outline"
+                class="bg-white/70"
+                size="icon"
+                @click="
+                    () => {
+                        router.push('/')
+                    }
+                "
+            >
+                <LucideHome />
+            </Button>
+        </div>
         <slot />
     </div>
 </template>

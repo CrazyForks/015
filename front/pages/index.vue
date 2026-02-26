@@ -11,7 +11,7 @@ import { isString } from 'lodash-es'
 const route = useRoute()
 const router = useRouter()
 const type = computed(() => route?.query?.type)
-onMounted(() => {
+watchEffect(() => {
     if (!isString(type.value) || type.value?.length === 0) {
         router.push({ query: { type: 'file' }, replace: true })
     }
