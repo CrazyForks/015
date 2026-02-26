@@ -8,7 +8,7 @@ const router = useRouter()
 
 <template>
     <div class="rounded-xl p-5 bg-white/50 backdrop-blur-xl w-full lg:w-200">
-        <div class="flex flex-row justify-between">
+        <div v-if="title" class="flex flex-row justify-between">
             <h1 class="text-xl font-normal">{{ title }}</h1>
             <Button
                 v-if="!!showBackButton"
