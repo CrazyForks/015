@@ -3,23 +3,20 @@ package controllers
 import (
 	"backend/internal/controllers/task"
 	"backend/internal/utils"
-	"backend/middleware"
 	"errors"
 	"pkg/models"
 	u "pkg/utils"
 
 	"github.com/hibiken/asynq"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
-var handleTaskMap = map[string]func(c *middleware.CustomContext) ([]byte, error){
+var handleTaskMap = map[string]func(c *echo.Context) ([]byte, error){
 	"image:compress": task.HandleImageCompress,
 }
 
-func CreateTask(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-
-	taskType := cc.Param("type")
+func CreateTask(c *echo.Context) error {
+	taskType := c.Param("type")
 	if taskType == "" {
 		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
 	}
@@ -27,7 +24,7 @@ func CreateTask(c echo.Context) error {
 	if !ok {
 		return utils.HTTPErrorHandler(c, errors.New("任务不存在"))
 	}
-	json, err := handleTask(cc)
+	json, err := handleTask(c)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -43,9 +40,8 @@ func CreateTask(c echo.Context) error {
 	})
 }
 
-func GetTask(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-	taskId := cc.Param("id")
+func GetTask(c *echo.Context) error {
+	taskId := c.Param("id")
 	if taskId == "" {
 		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
 	}

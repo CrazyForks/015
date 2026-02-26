@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"backend/internal/utils"
-	"backend/middleware"
 	"errors"
 	"fmt"
 	"pkg/models"
@@ -10,7 +9,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/spf13/cast"
 )
 
@@ -19,9 +18,8 @@ type DownloadShareClaims struct {
 	jwt.RegisteredClaims
 }
 
-func DownloadShare(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-	token := cc.FormValue("token")
+func DownloadShare(c *echo.Context) error {
+	token := c.FormValue("token")
 	if token == "" {
 		return utils.HTTPErrorHandler(c, errors.New("缺少token"))
 	}
@@ -43,7 +41,7 @@ func DownloadShare(c echo.Context) error {
 		if err != nil {
 			return err
 		}
-		return cc.Attachment(fmt.Sprintf("%s/%s", uploadPath, utils.GetFileId(fileInfo.FileHash, fileInfo.FileSize)), shareInfo.FileName)
+		return c.Attachment(fmt.Sprintf("%s/%s", uploadPath, utils.GetFileId(fileInfo.FileHash, fileInfo.FileSize)), shareInfo.FileName)
 	}
 	return utils.HTTPSuccessHandler(c, map[string]any{
 		"data": shareInfo.Data,
@@ -55,11 +53,9 @@ type VaildateShareProps struct {
 	Password string `json:"password"`
 }
 
-func VaildateShare(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-
+func VaildateShare(c *echo.Context) error {
 	r := new(VaildateShareProps)
-	if err := cc.Bind(r); err != nil {
+	if err := c.Bind(r); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 

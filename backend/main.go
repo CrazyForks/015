@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"pkg/utils"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"go.uber.org/zap"
 )
 
@@ -27,5 +27,7 @@ func main() {
 	for _, route := range routes {
 		e.Match(route.Method, route.Path, route.Handler)
 	}
-	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", utils.GetEnvWithDefault("api.port", "5001"))))
+	if err := e.Start(fmt.Sprintf(":%s", utils.GetEnvWithDefault("api.port", "5001"))); err != nil {
+		logger.Fatal("server failed", zap.Error(err))
+	}
 }

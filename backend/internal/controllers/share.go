@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"backend/internal/utils"
-	"backend/middleware"
 	"encoding/json"
 	"errors"
 	"pkg/models"
@@ -11,7 +10,7 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/spf13/cast"
 )
@@ -34,11 +33,11 @@ type ShareConfig struct {
 	HasPickupCode bool     `json:"has_pickup_code"`
 }
 
-func CreateShareInfo(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
+func CreateShareInfo(c *echo.Context) error {
+	owner, _ := echo.ContextGet[string](c, "auth")
 
 	r := new(CreateShareProps)
-	if err := cc.Bind(r); err != nil {
+	if err := c.Bind(r); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if r.Config.ExpireAt < 1 {
@@ -79,7 +78,7 @@ func CreateShareInfo(c echo.Context) error {
 		Data:      r.Data,
 		Type:      r.Type,
 		CreatedAt: time.Now().Unix(),
-		Owner:     cc.Auth.(string),
+		Owner:     owner,
 		ViewNum:   r.Config.ViewNum,
 		Password:  password,
 		// NotifyEmail: r.Config.NotifyEmail,
@@ -149,9 +148,8 @@ type GetShareProps struct {
 	ShareId string `param:"id"`
 }
 
-func GetShareInfo(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-	shareId := cc.Param("id")
+func GetShareInfo(c *echo.Context) error {
+	shareId := c.Param("id")
 	if shareId == "" {
 		return utils.HTTPErrorHandler(c, errors.New("缺少分享ID"))
 	}
@@ -199,9 +197,8 @@ func GetShareInfo(c echo.Context) error {
 	})
 }
 
-func GetShareByPickupCode(c echo.Context) error {
-	cc := c.(*middleware.CustomContext)
-	pickupCode := cc.Param("code")
+func GetShareByPickupCode(c *echo.Context) error {
+	pickupCode := c.Param("code")
 	if pickupCode == "" {
 		return utils.HTTPErrorHandler(c, errors.New("缺少提取码"))
 	}

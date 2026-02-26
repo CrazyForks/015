@@ -13,10 +13,10 @@ import (
 	"time"
 
 	"github.com/hibiken/asynq"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
-func CreateUploadTask(c echo.Context) error {
+func CreateUploadTask(c *echo.Context) error {
 	// cc := c.(*middleware.CustomContext)
 	r := new(models.FileInfo)
 	if err := c.Bind(r); err != nil {
@@ -124,7 +124,7 @@ type UploadFileSliceProps struct {
 	FileSlice *multipart.FileHeader `form:"file"`
 }
 
-func UploadFileSlice(c echo.Context) error {
+func UploadFileSlice(c *echo.Context) error {
 	r := new(UploadFileSliceProps)
 	if err := c.Bind(r); err != nil {
 		return utils.HTTPErrorHandler(c, err)
@@ -179,7 +179,7 @@ type FinishUploadTaskProps struct {
 	FileId string `json:"id"`
 }
 
-func FinishUploadTask(c echo.Context) error {
+func FinishUploadTask(c *echo.Context) error {
 	r := new(FinishUploadTaskProps)
 	if err := c.Bind(r); err != nil {
 		return utils.HTTPErrorHandler(c, err)

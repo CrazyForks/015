@@ -1,16 +1,17 @@
 package task
 
 import (
-	"backend/middleware"
 	"encoding/json"
 	"errors"
+
+	"github.com/labstack/echo/v5"
 )
 
 type GenCompressImageRequest struct {
 	FileId string `json:"file_id"`
 }
 
-func HandleImageCompress(c *middleware.CustomContext) ([]byte, error) {
+func HandleImageCompress(c *echo.Context) ([]byte, error) {
 
 	r := new(GenCompressImageRequest)
 	if err := c.Bind(r); err != nil {

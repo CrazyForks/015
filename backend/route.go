@@ -3,13 +3,13 @@ package main
 import (
 	"backend/internal/controllers"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type Route struct {
 	Method  []string
 	Path    string
-	Handler func(c echo.Context) error
+	Handler func(c *echo.Context) error
 }
 
 var routes = []Route{
