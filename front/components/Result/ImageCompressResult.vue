@@ -7,6 +7,8 @@ import useMyAppShare from '@/composables/useMyAppShare'
 import { toast } from 'vue-sonner'
 import type { handleFileComponentProps } from './types'
 import { get } from 'lodash-es'
+
+const { t } = useI18n()
 const emit = defineEmits<{
     (e: 'change', key: string): void
 }>()
@@ -106,10 +108,10 @@ watch(
 )
 </script>
 <template>
-    <BaseCard class="flex flex-col gap-3" title="图片压缩">
+    <BaseCard class="flex flex-col gap-3" :title="t('page.result.imageCompress.title')" :showBackButton="true">
         <div class="flex flex-row gap-3">
             <div class="rounded-xl flex flex-col bg-white/70 px-3 py-2 gap-1 basis-2/3">
-                <div class="text-sm font-semibold">总大小</div>
+                <div class="text-sm font-semibold">{{ t('page.result.imageCompress.totalSize') }}</div>
                 <div class="text-2xl font-light flex flex-row items-center gap-1">
                     <span v-if="totalSize.oldSize > 0" class="opacity-75">{{ filesize(totalSize.oldSize) }}</span>
                     <span v-else><Skeleton class="w-12 h-10" /></span>
@@ -126,7 +128,7 @@ watch(
                 </div>
             </div>
             <div class="rounded-xl flex flex-col bg-white/70 px-3 py-2 gap-1 basis-1/3">
-                <div class="text-sm font-semibold">任务</div>
+                <div class="text-sm font-semibold">{{ t('page.result.imageCompress.task') }}</div>
                 <div class="text-3xl font-light">{{ taskResults.length }}</div>
             </div>
         </div>
@@ -145,10 +147,15 @@ watch(
             </div>
             <div class="flex flex-row gap-1 items-center text-sm" v-if="taskResults?.[index]?.data?.status === 'retry'">
                 <LucideLoader2 class="size-4 animate-spin" />
-                重试 {{ taskResults?.[index]?.data?.err?.retry || 0 }}/{{ taskResults?.[index]?.data?.err?.max_retry || 0 }}
+                {{
+                    t('page.result.imageCompress.retry', [
+                        taskResults?.[index]?.data?.err?.retry ?? 0,
+                        taskResults?.[index]?.data?.err?.max_retry ?? 0,
+                    ])
+                }}
             </div>
             <div class="flex items-center justify-center" v-if="taskResults?.[index]?.data?.status === 'archived'">
-                <div class="text-sm text-red-500 px-2 py-1 rounded-md bg-red-100">失败</div>
+                <div class="text-sm text-red-500 px-2 py-1 rounded-md bg-red-100">{{ t('page.result.imageCompress.failed') }}</div>
             </div>
             <div class="flex flex-row gap-2 items-center" v-if="taskResults?.[index]?.data?.status === 'success'">
                 <div class="flex flex-col gap-1 items-center">

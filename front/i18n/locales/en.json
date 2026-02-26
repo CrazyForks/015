@@ -132,6 +132,13 @@
                 "link": "Link",
                 "copySuccess": "Copy Success"
             },
+            "imageCompress": {
+                "title": "Image Compress",
+                "totalSize": "Total Size",
+                "task": "Task",
+                "retry": "Retry {0}/{1}",
+                "failed": "Failed"
+            },
             "text": {
                 "title": "Share Successful",
                 "info": "Info",

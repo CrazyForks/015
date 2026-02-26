@@ -132,6 +132,13 @@
                 "link": "链接",
                 "copySuccess": "复制成功"
             },
+            "imageCompress": {
+                "title": "图片压缩",
+                "totalSize": "总大小",
+                "task": "任务",
+                "retry": "重试 {0}/{1}",
+                "failed": "失败"
+            },
             "text": {
                 "title": "分享成功",
                 "info": "信息",
