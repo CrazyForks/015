@@ -9,6 +9,7 @@ import (
 	"testing"
 	"worker/internal/services"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -65,34 +66,34 @@ func TestCompressJPEGHappyPath(t *testing.T) {
 	fmt.Printf("原图: %d | 压缩后: %d | 压缩率: %f%%\n", origInfo.Size(), compInfo.Size(), float64(compInfo.Size())/float64(origInfo.Size())*100)
 }
 
-func TestConvertImageWithMagickPNGToJPG(t *testing.T) {
+func TestConvertImageWithMagickA2B(t *testing.T) {
 	tmp := t.TempDir()
-	filePath := filepath.Join(tmp, "test.png")
-	// 从 test/resource 复制真实 PNG
+	testList := [][]string{
+		{"jpg", "png"},
+		{"png", "jpg"},
+		{"jpg", "webp"},
+		{"png", "webp"},
+	}
 	_, self, _, _ := runtime.Caller(0)
-	srcPath := filepath.Join(filepath.Dir(self), "..", "resource", "test.png")
-	err := utils.CopyFile(srcPath, filePath)
-	if err != nil {
-		t.Fatal(err)
+	for _, test := range testList {
+		filePath := filepath.Join(tmp, uuid.New().String())
+		srcPath := filepath.Join(filepath.Dir(self), "..", "resource", fmt.Sprintf("test.%s", test[0]))
+		err := utils.CopyFile(srcPath, filePath)
+		if err != nil {
+			t.Fatal(err)
+		}
+		got, err := services.ConvertImageWithMagick(filePath, fmt.Sprintf("image/%s", test[0]), test[1])
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.Equal(t, got, filePath+"_converted."+test[1])
+		info, err := os.Stat(got)
+		if err != nil {
+			t.Fatal(err)
+		}
+		assert.True(t, info.Size() > 0, "转换后的文件应该有内容")
+		fmt.Printf("%s -> %s 转换成功: %s (大小: %d bytes)\n", test[0], test[1], filepath.Base(got), info.Size())
 	}
-
-	// 测试 PNG 转 JPEG
-	got, err := services.ConvertImageWithMagick(filePath, "image/png", ".jpg")
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// 验证输出文件路径
-	assert.Equal(t, got, filePath+"_converted.jpg")
-
-	// 验证输出文件存在
-	info, err := os.Stat(got)
-	if err != nil {
-		t.Fatal(err)
-	}
-	assert.True(t, info.Size() > 0, "转换后的文件应该有内容")
-
-	fmt.Printf("PNG 转 JPEG 成功: %s (大小: %d bytes)\n", got, info.Size())
 }
 
 func TestConvertImageWithMagickInvalidExt(t *testing.T) {
@@ -106,7 +107,7 @@ func TestConvertImageWithMagickInvalidExt(t *testing.T) {
 	}
 
 	// 测试非法扩展名（防止注入）
-	_, err = services.ConvertImageWithMagick(filePath, "image/png", ".exe")
+	_, err = services.ConvertImageWithMagick(filePath, "image/png", "exe")
 	assert.Error(t, err, "应该返回错误")
 	assert.Equal(t, services.ErrUnsupportedMimeType, err, "应该返回 ErrUnsupportedMimeType 错误")
 }
