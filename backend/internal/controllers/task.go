@@ -13,6 +13,7 @@ import (
 
 var handleTaskMap = map[string]func(c *echo.Context) ([]byte, error){
 	"image:compress": task.HandleImageCompress,
+	"image:convert":  task.HandleImageConvert,
 }
 
 func CreateTask(c *echo.Context) error {
