@@ -1,4 +1,4 @@
-export type FileHandleKey = 'file-share' | 'file-image-compress'
+export type FileHandleKey = 'file-share' | 'file-image-compress' | 'file-image-convert'
 export type FileShareHandleProps = { type: FileHandleKey; config: Record<string, any> }
 
 export type TextHandleKey = 'text-share'

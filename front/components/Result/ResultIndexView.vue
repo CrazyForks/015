@@ -2,6 +2,7 @@
 import FileShareResult from '@/components/Result/FileShareResult.vue'
 import TextShareResult from '@/components/Result/TextShareResult.vue'
 import ImageCompressResult from '@/components/Result/ImageCompressResult.vue'
+import ImageConvertResult from '@/components/Result/ImageConvertResult.vue'
 import type { filehandleData, handleComponent, handleKey, texthandleData } from './types'
 
 const props = defineProps<{
@@ -16,6 +17,7 @@ const handleList: { component: handleComponent; key: handleKey }[] = [
     { component: FileShareResult, key: 'file-share' },
     { component: TextShareResult, key: 'text-share' },
     { component: ImageCompressResult, key: 'file-image-compress' },
+    { component: ImageConvertResult, key: 'file-image-convert' },
 ]
 
 const activeHandle = computed(() => {
