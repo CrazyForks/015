@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	u "pkg/utils"
 	"worker/internal/utils"
 
 	"github.com/samber/lo"
@@ -26,7 +27,7 @@ func CompressImage(filePath string, mimeType string) (string, error) {
 			return "", err
 		}
 	case "image/jpeg":
-		err := utils.CopyFile(filePath, compressedPath)
+		err := u.CopyFile(filePath, compressedPath)
 		if err != nil {
 			return "", err
 		}
