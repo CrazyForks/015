@@ -48,6 +48,11 @@ func GenStandardFile(filePath string, mimeType string) (GenStandardFileReturn, e
 	if err := os.Rename(filePath, newPath); err != nil {
 		return GenStandardFileReturn{}, err
 	}
+	expire := cast.ToInt64(u.GetEnvWithDefault("upload.remove_expire", "2")) * 3600
+	err = services.SetFileRemoveTask(fileId, time.Duration(expire)*time.Second)
+	if err != nil {
+		return GenStandardFileReturn{}, err
+	}
 	models.SetRedisFileInfo(fileId, models.RedisFileInfo{
 		FileInfo: models.FileInfo{
 			FileSize: fileSize,
@@ -56,12 +61,8 @@ func GenStandardFile(filePath string, mimeType string) (GenStandardFileReturn, e
 		},
 		FileType:  models.FileTypeUpload,
 		CreatedAt: time.Now().Unix(),
+		Expire:    expire,
 	})
-	expire := cast.ToInt64(u.GetEnvWithDefault("upload.remove_expire", "2")) * 3600
-	err = services.SetFileRemoveTask(fileId, time.Duration(expire)*time.Second)
-	if err != nil {
-		return GenStandardFileReturn{}, err
-	}
 	return GenStandardFileReturn{
 		FileId: fileId,
 		FileInfo: models.FileInfo{
