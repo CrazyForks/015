@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"pkg/models"
 	u "pkg/utils"
-	"worker/internal/utils"
 
 	"github.com/hibiken/asynq"
 	"github.com/samber/lo"
@@ -32,7 +31,7 @@ func RemoveShare(ctx context.Context, task *asynq.Task) error {
 	})
 	if len(shareIDs) == 0 {
 		rdb, ctx := u.GetRedisClient()
-		uploadPath, err := utils.GetUploadDirPath()
+		uploadPath, err := u.GetUploadDirPath()
 		if err != nil {
 			return err
 		}

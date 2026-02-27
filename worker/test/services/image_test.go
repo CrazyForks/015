@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"pkg/utils"
 	"runtime"
 	"testing"
 	"worker/internal/services"
-	"worker/internal/utils"
 
 	"github.com/stretchr/testify/assert"
 )
@@ -108,5 +108,5 @@ func TestConvertImageWithMagickInvalidExt(t *testing.T) {
 	// 测试非法扩展名（防止注入）
 	_, err = services.ConvertImageWithMagick(filePath, "image/png", ".exe")
 	assert.Error(t, err, "应该返回错误")
-	assert.Equal(t, services.ErrInvalidImageExt, err, "应该返回 ErrInvalidImageExt 错误")
+	assert.Equal(t, services.ErrUnsupportedMimeType, err, "应该返回 ErrUnsupportedMimeType 错误")
 }
