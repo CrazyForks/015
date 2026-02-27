@@ -1,7 +1,6 @@
 package services
 
 import (
-	"errors"
 	"os"
 	"path/filepath"
 	"pkg/models"
@@ -20,7 +19,7 @@ type GenStandardFileReturn struct {
 // 生成标准格式的file
 func GenStandardFile(filePath string, mimeType string) (GenStandardFileReturn, error) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		return GenStandardFileReturn{}, errors.New("文件不存在")
+		return GenStandardFileReturn{}, ErrFileNotFound
 	}
 	file, err := os.Open(filePath)
 	if err != nil {

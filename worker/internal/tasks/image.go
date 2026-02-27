@@ -3,6 +3,8 @@ package tasks
 import (
 	"context"
 	"encoding/json"
+	"errors"
+	"fmt"
 	"mime"
 	"path/filepath"
 	"pkg/models"
@@ -28,6 +30,9 @@ func CompressImage(ctx context.Context, task *asynq.Task) error {
 	originalPath := filepath.Join(uploadPath, payload.FileId)
 	compressedPath, err := services.CompressImage(originalPath, originalFileInfo.MimeType)
 	if err != nil {
+		if errors.Is(err, services.ErrUnsupportedMimeType) {
+			return fmt.Errorf("%w: %w", err, asynq.SkipRetry)
+		}
 		return err
 	}
 	compressedFileInfo, err := services.GenStandardFile(compressedPath, originalFileInfo.MimeType)
@@ -70,6 +75,9 @@ func ConvertImage(ctx context.Context, task *asynq.Task) error {
 	originalPath := filepath.Join(uploadPath, payload.FileId)
 	convertedPath, err := services.ConvertImageWithMagick(originalPath, originalFileInfo.MimeType, payload.TargetExt)
 	if err != nil {
+		if errors.Is(err, services.ErrUnsupportedMimeType) {
+			return fmt.Errorf("%w: %w", err, asynq.SkipRetry)
+		}
 		return err
 	}
 	mimeType := mime.TypeByExtension(payload.TargetExt)
