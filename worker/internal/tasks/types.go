@@ -1,5 +1,12 @@
 package tasks
 
+import "errors"
+
+var (
+	ErrNotFoundFile = errors.New("NotFoundFile")
+	ErrUnknown      = errors.New("Unknown")
+)
+
 type BaseFileTaskPayload struct {
 	FileId string `json:"file_id"`
 }
@@ -10,4 +17,9 @@ type RemoveFileTaskPayload struct {
 
 type CompressImageTaskPayload struct {
 	BaseFileTaskPayload
+}
+
+type ConvertImageTaskPayload struct {
+	BaseFileTaskPayload
+	TargetExt string `json:"target_ext"`
 }

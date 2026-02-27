@@ -3,6 +3,7 @@ module pkg/utils
 go 1.25.5
 
 require (
+	github.com/dustin/go-humanize v1.0.1
 	github.com/hibiken/asynq v0.25.1
 	github.com/redis/go-redis/v9 v9.17.3
 	github.com/spf13/viper v1.21.0
