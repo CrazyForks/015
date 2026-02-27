@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"mime"
 	"path/filepath"
 	"pkg/models"
 	"worker/internal/services"
@@ -19,7 +20,7 @@ func CompressImage(ctx context.Context, task *asynq.Task) error {
 	}
 	originalFileInfo, _ := models.GetRedisFileInfo(payload.FileId)
 	if originalFileInfo == nil || originalFileInfo.FileType != models.FileTypeUpload {
-		return errors.New("文件不存在")
+		return ErrNotFoundFile
 	}
 	uploadPath, err := utils.GetUploadDirPath()
 	if err != nil {
