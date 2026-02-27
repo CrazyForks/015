@@ -132,12 +132,12 @@ watch(
                 <div class="text-3xl font-light">{{ taskResults.length }}</div>
             </div>
         </div>
-        <div v-for="(item, index) in props?.data?.files" class="flex flex-row rounded-xl bg-white/70 p-3 justify-between">
-            <div class="flex flex-row gap-2 items-center">
+        <div v-for="(item, index) in props?.data?.files" class="flex flex-row rounded-xl bg-white/70 p-3 justify-between w-full gap-3">
+            <div class="flex flex-row gap-2 items-center w-full overflow-hidden">
                 <div class="*:h-12 overflow-hidden">
                     <FileIcon :file="item?.file" />
                 </div>
-                <div class="flex flex-col gap-0.5">
+                <div class="flex flex-col gap-0.5 flex-1 overflow-hidden">
                     <div class="truncate w-auto">{{ item?.file?.name }}</div>
                     <div class="text-xs opacity-50">{{ filesize(item?.file?.size ?? 0) }}</div>
                 </div>
