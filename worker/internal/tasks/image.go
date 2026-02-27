@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"mime"
+	"os"
 	"path/filepath"
 	"pkg/models"
 	"pkg/utils"
@@ -37,6 +38,7 @@ func CompressImage(ctx context.Context, task *asynq.Task) error {
 	}
 	compressedFileInfo, err := services.GenStandardFile(compressedPath, originalFileInfo.MimeType)
 	if err != nil {
+		defer os.Remove(compressedPath)
 		return err
 	}
 
@@ -80,12 +82,14 @@ func ConvertImage(ctx context.Context, task *asynq.Task) error {
 		}
 		return err
 	}
-	mimeType := mime.TypeByExtension(payload.TargetExt)
+	mimeType := mime.TypeByExtension(fmt.Sprintf(".%s", payload.TargetExt))
 	if mimeType == "" {
+		defer os.Remove(convertedPath)
 		return ErrUnknown
 	}
 	convertedFileInfo, err := services.GenStandardFile(convertedPath, mimeType)
 	if err != nil {
+		defer os.Remove(convertedPath)
 		return err
 	}
 
