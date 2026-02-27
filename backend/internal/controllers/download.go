@@ -37,11 +37,11 @@ func DownloadShare(c *echo.Context) error {
 
 	if shareInfo.Type == models.ShareTypeFile {
 		fileInfo, _ := models.GetRedisFileInfo(shareInfo.Data)
-		uploadPath, err := utils.GetUploadDirPath()
+		uploadPath, err := u.GetUploadDirPath()
 		if err != nil {
 			return err
 		}
-		return c.Attachment(fmt.Sprintf("%s/%s", uploadPath, utils.GetFileId(fileInfo.FileHash, fileInfo.FileSize)), shareInfo.FileName)
+		return c.Attachment(fmt.Sprintf("%s/%s", uploadPath, u.GetFileId(fileInfo.FileHash, fileInfo.FileSize)), shareInfo.FileName)
 	}
 	return utils.HTTPSuccessHandler(c, map[string]any{
 		"data": shareInfo.Data,

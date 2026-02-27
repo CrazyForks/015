@@ -5,8 +5,11 @@ import (
 	"os"
 	"path/filepath"
 	"pkg/models"
+	"pkg/services"
+	u "pkg/utils"
 	"time"
-	"worker/internal/utils"
+
+	"github.com/spf13/cast"
 )
 
 type GenStandardFileReturn struct {
@@ -31,14 +34,14 @@ func GenStandardFile(filePath string, mimeType string) (GenStandardFileReturn, e
 	}
 	fileSize := fileInfo.Size()
 
-	fileHash, err := utils.GetFileMd5(file)
+	fileHash, err := u.GetFileMd5(file)
 	if err != nil {
 		return GenStandardFileReturn{}, err
 	}
 
-	fileId := utils.GetFileId(fileHash, fileSize)
+	fileId := u.GetFileId(fileHash, fileSize)
 
-	uploadPath, err := utils.GetUploadDirPath()
+	uploadPath, err := u.GetUploadDirPath()
 	if err != nil {
 		return GenStandardFileReturn{}, err
 	}
@@ -55,7 +58,11 @@ func GenStandardFile(filePath string, mimeType string) (GenStandardFileReturn, e
 		FileType:  models.FileTypeUpload,
 		CreatedAt: time.Now().Unix(),
 	})
-
+	expire := cast.ToInt64(u.GetEnvWithDefault("upload.remove_expire", "2")) * 3600
+	err = services.SetFileRemoveTask(fileId, time.Duration(expire)*time.Second)
+	if err != nil {
+		return GenStandardFileReturn{}, err
+	}
 	return GenStandardFileReturn{
 		FileId: fileId,
 		FileInfo: models.FileInfo{

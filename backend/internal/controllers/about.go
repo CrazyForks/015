@@ -11,7 +11,7 @@ import (
 )
 
 func GetAbout(c *echo.Context) error {
-	maxStorageSize, err := utils.GetFileSize(u.GetEnv("upload.maximum"))
+	maxStorageSize, err := u.GetFileSize(u.GetEnv("upload.maximum"))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}

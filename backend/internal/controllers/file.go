@@ -9,11 +9,12 @@ import (
 	"mime/multipart"
 	"os"
 	"pkg/models"
+	s "pkg/services"
 	u "pkg/utils"
 	"time"
 
-	"github.com/hibiken/asynq"
 	"github.com/labstack/echo/v5"
+	"github.com/spf13/cast"
 )
 
 func CreateUploadTask(c *echo.Context) error {
@@ -26,14 +27,14 @@ func CreateUploadTask(c *echo.Context) error {
 	if r.FileSize == 0 || r.MimeType == "" || r.FileHash == "" {
 		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
 	}
-	fileId := utils.GetFileId(r.FileHash, r.FileSize)
+	fileId := u.GetFileId(r.FileHash, r.FileSize)
 	fileInfo, err := models.GetRedisFileInfo(fileId)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
 	if fileInfo != nil {
-		uploadPath, err := utils.GetUploadDirPath()
+		uploadPath, err := u.GetUploadDirPath()
 		if err != nil {
 			return utils.HTTPErrorHandler(c, err)
 		}
@@ -52,7 +53,7 @@ func CreateUploadTask(c *echo.Context) error {
 			"chunks":     sliceList,
 		})
 	}
-	maxStorageSize, err := utils.GetFileSize(u.GetEnv("upload.maximum"))
+	maxStorageSize, err := u.GetFileSize(u.GetEnv("upload.maximum"))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -78,7 +79,7 @@ func CreateUploadTask(c *echo.Context) error {
 	for r.FileSize/ChunkSize > 1000 {
 		ChunkSize *= 2
 	}
-	uploadTaskExpire := int64(3600)
+	uploadTaskExpire := cast.ToInt64(u.GetEnvWithDefault("upload.remove_expire", "2")) * 3600
 	newFileInfo := models.RedisFileInfo{
 		FileType: models.FileTypeInit,
 		FileInfo: models.FileInfo{
@@ -95,14 +96,7 @@ func CreateUploadTask(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	client := u.GetQueueClient()
-	json, err := json.Marshal(map[string]any{
-		"file_id": fileId,
-	})
-	if err != nil {
-		return utils.HTTPErrorHandler(c, err)
-	}
-	_, err = client.Enqueue(asynq.NewTask("file:remove", json), asynq.ProcessIn(time.Duration(uploadTaskExpire)*time.Second))
+	err = s.SetFileRemoveTask(fileId, time.Duration(uploadTaskExpire)*time.Second)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -161,7 +155,7 @@ func UploadFileSlice(c *echo.Context) error {
 	}
 	defer file.Close()
 
-	uploadPath, err := utils.GetUploadDirPath()
+	uploadPath, err := u.GetUploadDirPath()
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -203,7 +197,7 @@ func FinishUploadTask(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, errors.New("上传任务已过期"))
 	}
 
-	uploadPath, err := utils.GetUploadDirPath()
+	uploadPath, err := u.GetUploadDirPath()
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -231,7 +225,7 @@ func FinishUploadTask(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	file_hash, err := utils.GetFileMd5(file)
+	file_hash, err := u.GetFileMd5(file)
 
 	if err != nil {
 		file.Close()
