@@ -12,12 +12,6 @@ var (
 	ErrUnsupportedMimeType = errors.New("UnsupportedMimeType")
 )
 
-// 支持的图片扩展名列表
-var supportedImageExts = []string{
-	".jpg", ".jpeg", ".png", ".gif", ".webp",
-	// ".bmp", ".tiff", ".tif", ".svg", ".ico",
-}
-
 func CompressImage(filePath string, mimeType string) (string, error) {
 	compressedPath := filePath + "_compressed"
 	switch mimeType {
@@ -41,13 +35,18 @@ func CompressImage(filePath string, mimeType string) (string, error) {
 	return compressedPath, nil
 }
 
+// 支持的图片扩展名列表
+var supportedImageExts = []string{
+	"jpg", "jpeg", "png", "gif", "webp",
+}
+
 func ConvertImageWithMagick(filePath, mimeType, targetExt string) (string, error) {
 	// 验证目标扩展名是否合法
 	if !lo.Contains(supportedImageExts, targetExt) {
 		return "", ErrUnsupportedMimeType
 	}
 
-	outputPath := filePath + "_converted" + targetExt
+	outputPath := filePath + "_converted." + targetExt
 
 	_, err := utils.RunCommand("magick", filePath, outputPath)
 	if err != nil {
