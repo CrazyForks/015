@@ -116,9 +116,12 @@ func VaildateShare(c *echo.Context) error {
 	if latestViewNum < 1 {
 		latestViewNum = -1
 	}
-	models.SetRedisShareInfo(r.ShareId, models.RedisShareInfo{
+	err = models.SetRedisShareInfo(r.ShareId, models.RedisShareInfo{
 		ViewNum: latestViewNum,
 	})
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	// 统计分享数
 	currentDate := time.Now().Format("2006-01-02")
@@ -132,7 +135,10 @@ func VaildateShare(c *echo.Context) error {
 		}
 	}
 	statData.DownloadNum += 1
-	models.SetRedisStat(currentDate, *statData)
+	err = models.SetRedisStat(currentDate, *statData)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	if shareInfo.Type == models.ShareTypeFile {
 		return utils.HTTPSuccessHandler(c, map[string]any{

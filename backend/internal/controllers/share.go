@@ -73,7 +73,7 @@ func CreateShareInfo(c *echo.Context) error {
 		password = hash
 	}
 
-	models.SetRedisShareInfo(id, models.RedisShareInfo{
+	err = models.SetRedisShareInfo(id, models.RedisShareInfo{
 		Data:      r.Data,
 		Type:      r.Type,
 		CreatedAt: time.Now().Unix(),
@@ -84,6 +84,9 @@ func CreateShareInfo(c *echo.Context) error {
 		FileName: r.FileName,
 		ExpireAt: ExpireTime.Unix(),
 	})
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 	var pickupCode string
 	if r.Config.HasPickupCode {
 		for {
@@ -105,7 +108,10 @@ func CreateShareInfo(c *echo.Context) error {
 			return utils.HTTPErrorHandler(c, err)
 		}
 		shareIDs = append(shareIDs, id)
-		models.SetRedisFileShareRelational(r.Data, shareIDs)
+		err = models.SetRedisFileShareRelational(r.Data, shareIDs)
+		if err != nil {
+			return utils.HTTPErrorHandler(c, err)
+		}
 		client := u.GetQueueClient()
 		json, err := json.Marshal(map[string]any{"share_id": id, "file_id": r.Data})
 		if err != nil {
@@ -132,7 +138,10 @@ func CreateShareInfo(c *echo.Context) error {
 		}
 	}
 	statData.ShareNum += 1
-	models.SetRedisStat(currentDate, *statData)
+	err = models.SetRedisStat(currentDate, *statData)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	return utils.HTTPSuccessHandler(c, map[string]any{
 		"id":            id,

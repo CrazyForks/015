@@ -19,7 +19,7 @@ func CreateFileSlice(fileId string, uploadPath string, fileSlice io.Reader, file
 	if err != nil {
 		return "", err
 	}
-	defer dst.Close()
+	defer dst.Close() //nolint:errcheck
 
 	if _, err = io.Copy(dst, fileSlice); err != nil {
 		return "", err
@@ -50,13 +50,13 @@ func GetFileSliceList(fileId string, uploadPath string) ([]int, error) {
 func MergeFileSlices(fileId string, uploadPath string) (string, error) {
 	mergeFilePath := filepath.Join(uploadPath, fileId)
 	slicesPath := filepath.Join(uploadPath, fmt.Sprintf("%s_%s", fileId, "tmp"))
-	defer os.RemoveAll(slicesPath)
+	defer os.RemoveAll(slicesPath) //nolint:errcheck
 	// 创建最终文件
 	destFile, err := os.Create(mergeFilePath)
 	if err != nil {
 		return "", fmt.Errorf("创建合并文件失败: %v", err)
 	}
-	defer destFile.Close()
+	defer destFile.Close() //nolint:errcheck
 
 	fileSliceList, err := GetFileSliceList(fileId, uploadPath)
 	if err != nil {
@@ -71,23 +71,19 @@ func MergeFileSlices(fileId string, uploadPath string) (string, error) {
 		if err != nil {
 			return "", fmt.Errorf("打开切片文件失败: %v", err)
 		}
-
+		defer sf.Close() //nolint:errcheck
 		for {
 			n, err := sf.Read(buffer)
 			if err == io.EOF {
 				break
 			}
 			if err != nil {
-				sf.Close()
 				return "", fmt.Errorf("读取切片文件失败: %v", err)
 			}
-
 			if _, err := destFile.Write(buffer[:n]); err != nil {
-				sf.Close()
 				return "", fmt.Errorf("写入合并文件失败: %v", err)
 			}
 		}
-		sf.Close()
 	}
 	return mergeFilePath, nil
 }

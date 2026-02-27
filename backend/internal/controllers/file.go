@@ -152,7 +152,7 @@ func UploadFileSlice(c *echo.Context) error {
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck
 
 	uploadPath, err := u.GetUploadDirPath()
 	if err != nil {
@@ -219,29 +219,26 @@ func FinishUploadTask(c *echo.Context) error {
 	// 计算文件MD5
 	file, err := os.Open(mergeFilePath)
 	if err != nil {
-		file.Close()
-		os.Remove(mergeFilePath)
 		return utils.HTTPErrorHandler(c, err)
 	}
+	defer file.Close() //nolint:errcheck
 
 	file_hash, err := u.GetFileMd5(file)
-
-	if err != nil {
-		file.Close()
-		os.Remove(mergeFilePath)
+	if err != nil || file_hash != fileInfo.FileHash {
+		defer os.Remove(mergeFilePath) //nolint:errcheck
+		if err == nil {
+			return utils.HTTPErrorHandler(c, ErrFileMD5Mismatch)
+		}
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	if file_hash != fileInfo.FileHash {
-		file.Close()
-		os.Remove(mergeFilePath)
-		return utils.HTTPErrorHandler(c, ErrFileMD5Mismatch)
-	}
-	defer file.Close()
 	// 更新文件信息
-	models.SetRedisFileInfo(r.FileId, models.RedisFileInfo{
+	err = models.SetRedisFileInfo(r.FileId, models.RedisFileInfo{
 		FileType: models.FileTypeUpload,
 	})
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 	// 统计
 	currentDate := time.Now().Format("2006-01-02")
 	statData, _ := models.GetRedisStat(currentDate)
@@ -255,7 +252,10 @@ func FinishUploadTask(c *echo.Context) error {
 	}
 	statData.FileSize += fileInfo.FileSize
 	statData.FileNum += 1
-	models.SetRedisStat(currentDate, *statData)
+	err = models.SetRedisStat(currentDate, *statData)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	return utils.HTTPSuccessHandler(c, map[string]any{
 		"size":      fileInfo.FileSize,

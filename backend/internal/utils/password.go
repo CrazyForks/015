@@ -9,7 +9,7 @@ import (
 )
 
 var (
-	ErrPasswordSaltNotSet = errors.New("请配置PASSWORD_SALT")
+	ErrPasswordSaltNotSet = errors.New("PasswordSaltNotSet")
 )
 
 func GeneratePasswordHash(password string) (string, error) {
