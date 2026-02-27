@@ -2,7 +2,6 @@ package controllers
 
 import (
 	"backend/internal/utils"
-	"errors"
 	"fmt"
 	"pkg/models"
 	u "pkg/utils"
@@ -21,7 +20,7 @@ type DownloadShareClaims struct {
 func DownloadShare(c *echo.Context) error {
 	token := c.FormValue("token")
 	if token == "" {
-		return utils.HTTPErrorHandler(c, errors.New("缺少token"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	claims := DownloadShareClaims{}
 	t, err := jwt.ParseWithClaims(token, &claims, func(token *jwt.Token) (interface{}, error) {
@@ -31,7 +30,7 @@ func DownloadShare(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if !t.Valid {
-		return utils.HTTPErrorHandler(c, errors.New("token格式错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	shareInfo, _ := models.GetRedisShareInfo(claims.ShareId)
 
@@ -60,7 +59,7 @@ func VaildateShare(c *echo.Context) error {
 	}
 
 	if r.ShareId == "" {
-		return utils.HTTPErrorHandler(c, errors.New("缺少分享ID"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 
 	shareInfo, err := models.GetRedisShareInfo(r.ShareId)
@@ -68,23 +67,23 @@ func VaildateShare(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if shareInfo == nil {
-		return utils.HTTPErrorHandler(c, errors.New("分享不存在"))
+		return utils.HTTPErrorHandler(c, ErrShareNotFound)
 	}
 	if shareInfo.Password != "" {
 		if r.Password == "" {
-			return utils.HTTPErrorHandler(c, errors.New("缺少分享密码"))
+			return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 		}
 		hash, err := utils.GeneratePasswordHash(r.Password)
 		if err != nil {
 			return utils.HTTPErrorHandler(c, err)
 		}
 		if hash != shareInfo.Password {
-			return utils.HTTPErrorHandler(c, errors.New("分享密码错误"))
+			return utils.HTTPErrorHandler(c, ErrInvalidSharePassword)
 		}
 	}
 	// 如果下载次数为0，则设置为-1 防止空值问题
 	if shareInfo.ViewNum < 1 {
-		return utils.HTTPErrorHandler(c, errors.New("下载次数不足"))
+		return utils.HTTPErrorHandler(c, ErrInsufficientDownloadQuota)
 	}
 	downloadWindow := u.GetEnvWithDefault("share.download_window", "12")
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, DownloadShareClaims{
@@ -105,10 +104,10 @@ func VaildateShare(c *echo.Context) error {
 			return utils.HTTPErrorHandler(c, err)
 		}
 		if fileInfo == nil {
-			return utils.HTTPErrorHandler(c, errors.New("分享文件不存在"))
+			return utils.HTTPErrorHandler(c, ErrShareFileNotFound)
 		}
 		if fileInfo.FileType != models.FileTypeUpload {
-			return utils.HTTPErrorHandler(c, errors.New("分享文件状态错误"))
+			return utils.HTTPErrorHandler(c, ErrInvalidShareFileState)
 		}
 	}
 	// download_nums 必须放在创建token的时候减掉，不然多线程下载会导致多次减掉

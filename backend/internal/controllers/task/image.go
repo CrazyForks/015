@@ -2,7 +2,6 @@ package task
 
 import (
 	"encoding/json"
-	"errors"
 
 	"github.com/labstack/echo/v5"
 )
@@ -17,7 +16,7 @@ func HandleImageCompress(c *echo.Context) ([]byte, error) {
 		return nil, err
 	}
 	if r.FileId == "" {
-		return nil, errors.New("调用接口参数错误")
+		return nil, ErrInvalidRequest
 	}
 	json, err := json.Marshal(map[string]any{
 		"file_id": r.FileId,
@@ -39,11 +38,12 @@ func HandleImageConvert(c *echo.Context) ([]byte, error) {
 	if err := c.Bind(r); err != nil {
 		return nil, err
 	}
-	if r.FileId == "" {
-		return nil, errors.New("调用接口参数错误")
+	if r.FileId == "" || r.TargetExt == "" {
+		return nil, ErrInvalidRequest
 	}
 	json, err := json.Marshal(map[string]any{
-		"file_id": r.FileId,
+		"file_id":    r.FileId,
+		"target_ext": r.TargetExt,
 	})
 	if err != nil {
 		return nil, err

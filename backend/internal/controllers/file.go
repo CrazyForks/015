@@ -4,7 +4,6 @@ import (
 	"backend/internal/services"
 	"backend/internal/utils"
 	"encoding/json"
-	"errors"
 	"math"
 	"mime/multipart"
 	"os"
@@ -25,7 +24,7 @@ func CreateUploadTask(c *echo.Context) error {
 	}
 
 	if r.FileSize == 0 || r.MimeType == "" || r.FileHash == "" {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	fileId := u.GetFileId(r.FileHash, r.FileSize)
 	fileInfo, err := models.GetRedisFileInfo(fileId)
@@ -71,7 +70,7 @@ func CreateUploadTask(c *echo.Context) error {
 		totalSize += fileInfo.FileSize
 	}
 	if totalSize+r.FileSize > int64(maxStorageSize) {
-		return utils.HTTPErrorHandler(c, errors.New("存储空间不足"))
+		return utils.HTTPErrorHandler(c, ErrInsufficientStorage)
 	}
 
 	ChunkSize := int64(0.25 * 1024 * 1024)
@@ -125,7 +124,7 @@ func UploadFileSlice(c *echo.Context) error {
 	}
 
 	if r.FileId == "" || r.FileIndex == 0 || r.FileSlice == nil {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	fileInfo, err := models.GetRedisFileInfo(r.FileId)
 	if err != nil {
@@ -134,18 +133,18 @@ func UploadFileSlice(c *echo.Context) error {
 
 	now := time.Now().Unix()
 	if fileInfo.CreatedAt+fileInfo.Expire < now {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务已过期"))
+		return utils.HTTPErrorHandler(c, ErrUploadTaskExpired)
 	}
 
 	if fileInfo.FileType != models.FileTypeInit {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务状态错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidUploadTaskState)
 	}
 	if r.FileIndex > ((fileInfo.FileSize / fileInfo.ChunkSize) + 1) {
-		return utils.HTTPErrorHandler(c, errors.New("文件切片索引错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidFileSliceIndex)
 	}
 
 	if r.FileSlice.Size > fileInfo.ChunkSize {
-		return utils.HTTPErrorHandler(c, errors.New("文件切片大小错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidFileSliceSize)
 	}
 
 	// 打开文件
@@ -180,7 +179,7 @@ func FinishUploadTask(c *echo.Context) error {
 	}
 
 	if r.FileId == "" {
-		return utils.HTTPErrorHandler(c, errors.New("文件ID不能为空"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 
 	fileInfo, err := models.GetRedisFileInfo(r.FileId)
@@ -189,12 +188,12 @@ func FinishUploadTask(c *echo.Context) error {
 	}
 
 	if fileInfo.FileType != models.FileTypeInit {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务状态错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidUploadTaskState)
 	}
 
 	now := time.Now().Unix()
 	if fileInfo.CreatedAt+fileInfo.Expire < now {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务已过期"))
+		return utils.HTTPErrorHandler(c, ErrUploadTaskExpired)
 	}
 
 	uploadPath, err := u.GetUploadDirPath()
@@ -208,7 +207,7 @@ func FinishUploadTask(c *echo.Context) error {
 	}
 
 	if len(fileSliceList) != int(math.Ceil(float64(fileInfo.FileSize)/float64(fileInfo.ChunkSize))) {
-		return utils.HTTPErrorHandler(c, errors.New("文件切片不完整"))
+		return utils.HTTPErrorHandler(c, ErrIncompleteFileSlices)
 	}
 
 	// 最终合并后的文件路径
@@ -236,7 +235,7 @@ func FinishUploadTask(c *echo.Context) error {
 	if file_hash != fileInfo.FileHash {
 		file.Close()
 		os.Remove(mergeFilePath)
-		return utils.HTTPErrorHandler(c, errors.New("文件MD5不一致"))
+		return utils.HTTPErrorHandler(c, ErrFileMD5Mismatch)
 	}
 	defer file.Close()
 	// 更新文件信息

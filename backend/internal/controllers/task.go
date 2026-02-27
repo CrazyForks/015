@@ -3,7 +3,6 @@ package controllers
 import (
 	"backend/internal/controllers/task"
 	"backend/internal/utils"
-	"errors"
 	"pkg/models"
 	u "pkg/utils"
 
@@ -19,11 +18,11 @@ var handleTaskMap = map[string]func(c *echo.Context) ([]byte, error){
 func CreateTask(c *echo.Context) error {
 	taskType := c.Param("type")
 	if taskType == "" {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	handleTask, ok := handleTaskMap[taskType]
 	if !ok {
-		return utils.HTTPErrorHandler(c, errors.New("任务不存在"))
+		return utils.HTTPErrorHandler(c, ErrTaskNotFound)
 	}
 	json, err := handleTask(c)
 	if err != nil {
@@ -44,7 +43,7 @@ func CreateTask(c *echo.Context) error {
 func GetTask(c *echo.Context) error {
 	taskId := c.Param("id")
 	if taskId == "" {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 
 	taskInfo, err := models.GetRedisTaskInfo(taskId)
@@ -56,7 +55,7 @@ func GetTask(c *echo.Context) error {
 
 		queneTaskInfo, err := client.GetTaskInfo("default", taskId)
 		if err != nil {
-			return utils.HTTPErrorHandler(c, errors.New("任务已过期"))
+			return utils.HTTPErrorHandler(c, ErrTaskExpired)
 		}
 		stateMap := map[asynq.TaskState]string{
 			asynq.TaskStateActive:    "processing",

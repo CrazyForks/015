@@ -3,7 +3,6 @@ package controllers
 import (
 	"backend/internal/utils"
 	"encoding/json"
-	"errors"
 	"pkg/models"
 	u "pkg/utils"
 	"strings"
@@ -41,11 +40,11 @@ func CreateShareInfo(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if r.Config.ExpireAt < 1 {
-		return utils.HTTPErrorHandler(c, errors.New("非法的分享过期时间"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	ExpireTime := time.Now().Add(time.Duration(r.Config.ExpireAt) * time.Minute)
 	if r.Data == "" || (r.Type != models.ShareTypeFile && r.Type != models.ShareTypeText) || ExpireTime.Before(time.Now()) || r.Config.ViewNum < 1 {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 
 	id, err := gonanoid.New()
@@ -59,10 +58,10 @@ func CreateShareInfo(c *echo.Context) error {
 			return utils.HTTPErrorHandler(c, err)
 		}
 		if fileInfo == nil {
-			return utils.HTTPErrorHandler(c, errors.New("分享文件不存在"))
+			return utils.HTTPErrorHandler(c, ErrShareFileNotFound)
 		}
 		if fileInfo.FileType != models.FileTypeUpload {
-			return utils.HTTPErrorHandler(c, errors.New("分享文件状态错误"))
+			return utils.HTTPErrorHandler(c, ErrInvalidShareFileState)
 		}
 	}
 	password := ""
@@ -151,7 +150,7 @@ type GetShareProps struct {
 func GetShareInfo(c *echo.Context) error {
 	shareId := c.Param("id")
 	if shareId == "" {
-		return utils.HTTPErrorHandler(c, errors.New("缺少分享ID"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 
 	shareInfo, err := models.GetRedisShareInfo(shareId)
@@ -159,7 +158,7 @@ func GetShareInfo(c *echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if shareInfo == nil || shareInfo.ViewNum < 1 {
-		return utils.HTTPErrorHandler(c, errors.New("分享不存在"))
+		return utils.HTTPErrorHandler(c, ErrShareNotFound)
 	}
 
 	if shareInfo.Type == models.ShareTypeFile {
@@ -168,10 +167,10 @@ func GetShareInfo(c *echo.Context) error {
 			return utils.HTTPErrorHandler(c, err)
 		}
 		if fileInfo == nil {
-			return utils.HTTPErrorHandler(c, errors.New("分享文件不存在"))
+			return utils.HTTPErrorHandler(c, ErrShareFileNotFound)
 		}
 		if fileInfo.FileType != models.FileTypeUpload {
-			return utils.HTTPErrorHandler(c, errors.New("分享文件状态错误"))
+			return utils.HTTPErrorHandler(c, ErrInvalidShareFileState)
 		}
 		return utils.HTTPSuccessHandler(c, map[string]any{
 			"id":            shareId,
@@ -200,14 +199,14 @@ func GetShareInfo(c *echo.Context) error {
 func GetShareByPickupCode(c *echo.Context) error {
 	pickupCode := c.Param("code")
 	if pickupCode == "" {
-		return utils.HTTPErrorHandler(c, errors.New("缺少提取码"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	shareId, err := models.GetRedisPickupData(strings.ToUpper(pickupCode))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 	if shareId == "" {
-		return utils.HTTPErrorHandler(c, errors.New("分享不存在"))
+		return utils.HTTPErrorHandler(c, ErrShareNotFound)
 	}
 	return utils.HTTPSuccessHandler(c, map[string]any{
 		"share_id": shareId,
