@@ -59,6 +59,10 @@
                     "3days": "3天"
                 }
             },
+            "imageConvert": {
+                "title": "图片转换",
+                "targetFormat": "目标格式"
+            },
             "text": {
                 "title": "分享选项",
                 "viewNums": "浏览次数",
