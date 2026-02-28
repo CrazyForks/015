@@ -15,6 +15,7 @@ import { cx } from 'class-variance-authority'
 import { isObject } from 'lodash-es'
 import showDrawer from '@/lib/showDrawer'
 import FileShareHandle from '@/components/Preprocessing/FileShareHandle.vue'
+import ImageConvertHandle from '@/components/Preprocessing/ImageConvertHandle.vue'
 import type { FileShareHandleProps } from '../Preprocessing/types'
 const { t } = useI18n()
 const props = defineProps<{
@@ -50,6 +51,16 @@ const actions = [
         className: 'bg-red-300',
         onClick: () => {
             props.onFileHandle({ type: 'file-image-compress', config: {} })
+        },
+    },
+    isImage.value && {
+        label: t('page.upload.file.handleType.file-image-convert'),
+        icon: LucideArrowRightLeft,
+        className: 'bg-purple-300',
+        onClick: () => {
+            showDrawer({
+                render: ({ hide }) => h(ImageConvertHandle, { ...props, hide }),
+            })
         },
     },
     // isImage.value && {

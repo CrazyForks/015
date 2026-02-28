@@ -158,7 +158,7 @@ watch(
                 <div class="text-sm text-red-500 px-2 py-1 rounded-md bg-red-100">{{ t('page.result.imageCompress.failed') }}</div>
             </div>
             <div class="flex flex-row gap-2 items-center" v-if="taskResults?.[index]?.data?.status === 'success'">
-                <div class="flex flex-col gap-1 items-center">
+                <div class="flex flex-col gap-1 items-center shrink-0">
                     <div class="rounded flex flex-row items-center bg-green-100 text-green-600 px-1 text-xs">
                         <LucideArrowDown class="size-4" />
                         {{
