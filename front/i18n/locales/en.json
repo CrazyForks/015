@@ -21,7 +21,8 @@
                 "addMore": "Add More",
                 "handleType": {
                     "file-share": "File Share",
-                    "file-image-compress": "Image Compress"
+                    "file-image-compress": "Image Compress",
+                    "file-image-convert": "Format Convert"
                 }
             },
             "text": {

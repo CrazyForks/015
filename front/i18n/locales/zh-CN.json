@@ -21,7 +21,8 @@
                 "addMore": "添加更多",
                 "handleType": {
                     "file-share": "文件分享",
-                    "file-image-compress": "图片压缩"
+                    "file-image-compress": "图片压缩",
+                    "file-image-convert": "格式转换"
                 }
             },
             "text": {
