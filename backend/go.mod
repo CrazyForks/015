@@ -3,7 +3,6 @@ module backend
 go 1.25.5
 
 require (
-	github.com/dustin/go-humanize v1.0.1
 	github.com/golang-jwt/jwt/v5 v5.3.1
 	github.com/gorilla/sessions v1.4.0
 	github.com/hibiken/asynq v0.25.1
