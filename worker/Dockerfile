@@ -12,7 +12,14 @@ RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && g
 
 # Copy the source code. Note the slash at the end, as explained in
 # https://docs.docker.com/engine/reference/builder/#copy
-COPY . .
+COPY go.work go.work.sum ./
+COPY worker/ ./worker/
+COPY pkg/ ./pkg/
+RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && \
+    (cd worker && go mod download) && \
+    (cd pkg/utils && go mod download) && \
+    (cd pkg/models && go mod download) && \
+    (cd pkg/services && go mod download)
 
 # Build
 RUN CGO_ENABLED=0 GOOS=linux go build -o worker

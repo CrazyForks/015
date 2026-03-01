@@ -15,14 +15,17 @@ RUN corepack enable pnpm && pnpm build
 
 FROM golang:1.25.5 AS backend-builder
 WORKDIR /app
-# Download Go modules
-COPY backend/go.mod backend/go.sum ./
-RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && go mod download
-# Copy the source code. Note the slash at the end, as explained in
-# https://docs.docker.com/engine/reference/builder/#copy
-COPY backend/ .
-# Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o backend
+# Workspace and module manifests for cache
+COPY go.work go.work.sum ./
+COPY backend/ ./backend/
+COPY pkg/ ./pkg/
+RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && \
+    (cd backend && go mod download) && \
+    (cd pkg/utils && go mod download) && \
+    (cd pkg/models && go mod download) && \
+    (cd pkg/services && go mod download)
+# Build from workspace root so pkg/utils, pkg/models, pkg/services resolve
+RUN CGO_ENABLED=0 GOOS=linux go build -o backend ./backend
 
 
 FROM front-base AS runner
