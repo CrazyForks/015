@@ -5,7 +5,7 @@ FROM front-base AS front-deps
 RUN apk add --no-cache gcompat
 WORKDIR /app
 COPY . .
-RUN corepack enable pnpm && pnpm i && pnpm --filter=015-front deploy dist
+RUN corepack enable pnpm && pnpm i && pnpm --filter=015-front deploy dist --legacy
 
 
 FROM front-base AS front-builder
@@ -13,7 +13,7 @@ WORKDIR /app
 COPY --from=front-deps /app/dist/ .
 RUN corepack enable pnpm && pnpm build
 
-FROM golang:1.24.3 AS backend-builder
+FROM golang:1.25.5 AS backend-builder
 WORKDIR /app
 # Download Go modules
 COPY backend/go.mod backend/go.sum ./
