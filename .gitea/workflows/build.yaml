@@ -25,7 +25,7 @@ jobs:
       - name: build-worker
         uses: docker/build-push-action@v5
         with:
-          context: ./worker/
+          context: .
           file: ./worker/Dockerfile
           push: false
           tags: 015-worker:test
