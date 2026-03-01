@@ -18,12 +18,10 @@ WORKDIR /app
 # Workspace and module manifests for cache
 COPY go.work go.work.sum ./
 COPY backend/ ./backend/
+COPY worker/ ./worker/
 COPY pkg/ ./pkg/
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && \
-    (cd backend && go mod download) && \
-    (cd pkg/utils && go mod download) && \
-    (cd pkg/models && go mod download) && \
-    (cd pkg/services && go mod download)
+    go mod download
 # Build from workspace root so pkg/utils, pkg/models, pkg/services resolve
 RUN CGO_ENABLED=0 GOOS=linux go build -o backend ./backend
 
