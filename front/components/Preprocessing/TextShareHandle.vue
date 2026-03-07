@@ -15,37 +15,37 @@ const props = defineProps<{
 <template>
     <VeeForm v-slot="{ values, setFieldValue }" :initialValues="{ download_nums: 1, expire_time: 1440 }">
         <div class="flex flex-col gap-3">
-            <h2 class="text-lg font-bold">{{ t('textshare.title') }}</h2>
+            <h2 class="text-lg font-bold">{{ t('page.shareOptions.text.title') }}</h2>
             <div class="flex flex-row items-center gap-2 text-sm">
                 <SelectField
                     name="download_nums"
-                    :label="t('textshare.viewNums')"
+                    :label="t('page.shareOptions.text.viewNums')"
                     :options="[
-                        { label: t('textshare.viewOptions.1time'), value: 1 },
-                        { label: t('textshare.viewOptions.2times'), value: 2 },
-                        { label: t('textshare.viewOptions.3times'), value: 3 },
-                        { label: t('textshare.viewOptions.5times'), value: 5 },
-                        { label: t('textshare.viewOptions.10times'), value: 10 },
+                        { label: t('page.shareOptions.text.viewOptions.xview', [1]), value: 1 },
+                        { label: t('page.shareOptions.text.viewOptions.xview', [2]), value: 2 },
+                        { label: t('page.shareOptions.text.viewOptions.xview', [3]), value: 3 },
+                        { label: t('page.shareOptions.text.viewOptions.xview', [5]), value: 5 },
+                        { label: t('page.shareOptions.text.viewOptions.xview', [10]), value: 10 },
                     ]"
                 />
-                {{ t('textshare.or') }}
+                {{ t('page.shareOptions.text.or') }}
                 <SelectField
                     name="expire_time"
-                    :label="t('textshare.expireTime')"
+                    :label="t('page.shareOptions.text.expireTime')"
                     :options="[
-                        { label: t('textshare.expireOptions.5min'), value: 5 },
-                        { label: t('textshare.expireOptions.1hour'), value: 60 },
-                        { label: t('textshare.expireOptions.1day'), value: 1440 },
-                        { label: t('textshare.expireOptions.3days'), value: 4320 },
+                        { label: t('page.shareOptions.text.expireOptions.5min'), value: 5 },
+                        { label: t('page.shareOptions.text.expireOptions.1hour'), value: 60 },
+                        { label: t('page.shareOptions.text.expireOptions.1day'), value: 1440 },
+                        { label: t('page.shareOptions.text.expireOptions.3days'), value: 4320 },
                     ]"
                 />
-                {{ t('textshare.expireAfter') }}
+                {{ t('page.shareOptions.text.expireAfter') }}
             </div>
             <div class="flex flex-col gap-1">
                 <div class="flex flex-row gap-3 min-h-9">
                     <SwitchField
                         name="has_pickup_code"
-                        :label="t('textshare.pickupCode')"
+                        :label="t('page.shareOptions.text.pickupCode')"
                         :rules="
                             (value: boolean) => {
                                 if (!!value) {
@@ -59,7 +59,7 @@ const props = defineProps<{
                 <div class="flex flex-row gap-3 min-h-9">
                     <SwitchField
                         name="has_password"
-                        :label="t('textshare.passwordProtection')"
+                        :label="t('page.shareOptions.text.passwordProtection')"
                         :rules="
                             (value: boolean) => {
                                 if (!!value) {
@@ -69,11 +69,21 @@ const props = defineProps<{
                             }
                         "
                     />
-                    <InputField v-if="!!values.has_password" name="password" :placeholder="t('textshare.passwordPlaceholder')" rules="required" />
+                    <InputField
+                        v-if="!!values.has_password"
+                        name="password"
+                        :placeholder="t('page.shareOptions.text.passwordPlaceholder')"
+                        rules="required"
+                    />
                 </div>
                 <div class="flex flex-row gap-3 min-h-9">
-                    <SwitchField name="has_notify" :label="t('textshare.readNotify')" />
-                    <InputField v-if="!!values.has_notify" name="notify_email" :placeholder="t('textshare.emailPlaceholder')" rules="required" />
+                    <SwitchField name="has_notify" :label="t('page.shareOptions.text.readNotify')" />
+                    <InputField
+                        v-if="!!values.has_notify"
+                        name="notify_email"
+                        :placeholder="t('page.shareOptions.text.emailPlaceholder')"
+                        rules="required"
+                    />
                 </div>
             </div>
             <FormButton

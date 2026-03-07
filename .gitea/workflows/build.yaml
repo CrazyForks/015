@@ -1,0 +1,31 @@
+name: Build
+
+on:
+  pull_request:
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: docker/setup-buildx-action@v3
+      - name: Set build time
+        id: build-time
+        run: echo "time=$(date +%s)" >> $GITHUB_OUTPUT
+      - name: build-app
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./Dockerfile
+          push: false
+          tags: 015-app:test
+          build-args: |
+            VERSION=${{ gitea.ref_name || github.ref_name }}
+            BUILD_TIME=${{ steps.build-time.outputs.time }}
+      - name: build-worker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./worker/Dockerfile
+          push: false
+          tags: 015-worker:test

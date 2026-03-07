@@ -12,3 +12,5 @@ watchEffect(() => {
     dayjs.locale(locale.value.toLowerCase())
 })
 </script>
+
+<template></template>

@@ -15,6 +15,7 @@ import { cx } from 'class-variance-authority'
 import { isObject } from 'lodash-es'
 import showDrawer from '@/lib/showDrawer'
 import FileShareHandle from '@/components/Preprocessing/FileShareHandle.vue'
+import ImageConvertHandle from '@/components/Preprocessing/ImageConvertHandle.vue'
 import type { FileShareHandleProps } from '../Preprocessing/types'
 const { t } = useI18n()
 const props = defineProps<{
@@ -35,7 +36,7 @@ const isPPT = computed(() => props.file.every((r) => r?.type?.startsWith('applic
 const isDocument = computed(() => isPDF.value || isDOC.value || isXLS.value || isPPT.value)
 const actions = [
     {
-        label: t('file.handleType.file-share'),
+        label: t('page.upload.file.handleType.file-share'),
         icon: LucideShare,
         className: 'bg-green-300',
         onClick: () => {
@@ -45,11 +46,21 @@ const actions = [
         },
     },
     isImage.value && {
-        label: t('file.handleType.file-image-compress'),
+        label: t('page.upload.file.handleType.file-image-compress'),
         icon: LucideImageMinus,
         className: 'bg-red-300',
         onClick: () => {
             props.onFileHandle({ type: 'file-image-compress', config: {} })
+        },
+    },
+    isImage.value && {
+        label: t('page.upload.file.handleType.file-image-convert'),
+        icon: LucideArrowRightLeft,
+        className: 'bg-purple-300',
+        onClick: () => {
+            showDrawer({
+                render: ({ hide }) => h(ImageConvertHandle, { ...props, hide }),
+            })
         },
     },
     // isImage.value && {

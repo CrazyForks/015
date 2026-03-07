@@ -2,8 +2,8 @@ package main
 
 import (
 	"log"
+	"pkg/utils"
 	"worker/internal/tasks"
-	"worker/internal/utils"
 	"worker/middleware"
 
 	"github.com/hibiken/asynq"
@@ -32,6 +32,7 @@ func main() {
 	mux.HandleFunc("share:remove", tasks.RemoveShare)
 	mux.HandleFunc("file:remove", tasks.RemoveFile)
 	mux.HandleFunc("image:compress", tasks.CompressImage)
+	mux.HandleFunc("image:convert", tasks.ConvertImage)
 
 	if err := srv.Run(mux); err != nil {
 		log.Fatalf("could not run server: %v", err)

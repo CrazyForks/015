@@ -1,11 +1,12 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/utils"
 	"encoding/json"
+	"pkg/models"
+	u "pkg/utils"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 const (
@@ -26,7 +27,7 @@ type QueueChartData struct {
 	Failed    int `json:"failed"`
 }
 
-func GetStat(c echo.Context) error {
+func GetStat(c *echo.Context) error {
 	statInfoMap, err := models.GetRedisStatAll()
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
@@ -47,7 +48,7 @@ func GetStat(c echo.Context) error {
 		}
 	}
 
-	queueInspector := utils.GetQueueInspector()
+	queueInspector := u.GetQueueInspector()
 	queues, err := queueInspector.History("default", QueueHistoryDays)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)

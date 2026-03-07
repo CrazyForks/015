@@ -5,8 +5,8 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-	"worker/internal/models"
-	"worker/internal/utils"
+	"pkg/models"
+	u "pkg/utils"
 
 	"github.com/hibiken/asynq"
 	"github.com/samber/lo"
@@ -30,8 +30,8 @@ func RemoveShare(ctx context.Context, task *asynq.Task) error {
 		return x != payload.ShareId
 	})
 	if len(shareIDs) == 0 {
-		rdb, ctx := utils.GetRedisClient()
-		uploadPath, err := utils.GetUploadDirPath()
+		rdb, ctx := u.GetRedisClient()
+		uploadPath, err := u.GetUploadDirPath()
 		if err != nil {
 			return err
 		}

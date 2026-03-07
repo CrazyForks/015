@@ -1,22 +1,22 @@
 package controllers
 
 import (
-	"backend/internal/models"
 	"backend/internal/services"
 	"backend/internal/utils"
 	"encoding/json"
-	"errors"
-	"fmt"
+	"math"
 	"mime/multipart"
 	"os"
-	"path/filepath"
+	"pkg/models"
+	s "pkg/services"
+	u "pkg/utils"
 	"time"
 
-	"github.com/hibiken/asynq"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
+	"github.com/spf13/cast"
 )
 
-func CreateUploadTask(c echo.Context) error {
+func CreateUploadTask(c *echo.Context) error {
 	// cc := c.(*middleware.CustomContext)
 	r := new(models.FileInfo)
 	if err := c.Bind(r); err != nil {
@@ -24,12 +24,23 @@ func CreateUploadTask(c echo.Context) error {
 	}
 
 	if r.FileSize == 0 || r.MimeType == "" || r.FileHash == "" {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
-	fileId := utils.GetFileId(r.FileHash, r.FileSize)
-	fileInfo, _ := models.GetRedisFileInfo(fileId)
+	fileId := u.GetFileId(r.FileHash, r.FileSize)
+	fileInfo, err := models.GetRedisFileInfo(fileId)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	if fileInfo != nil {
+		uploadPath, err := u.GetUploadDirPath()
+		if err != nil {
+			return utils.HTTPErrorHandler(c, err)
+		}
+		sliceList, err := services.GetFileSliceList(fileId, uploadPath)
+		if err != nil {
+			return utils.HTTPErrorHandler(c, err)
+		}
 		return utils.HTTPSuccessHandler(c, map[string]any{
 			"size":       fileInfo.FileSize,
 			"mime_type":  fileInfo.MimeType,
@@ -38,9 +49,10 @@ func CreateUploadTask(c echo.Context) error {
 			"expire":     fileInfo.Expire,
 			"id":         fileId,
 			"chunk_size": fileInfo.ChunkSize,
+			"chunks":     sliceList,
 		})
 	}
-	maxStorageSize, err := utils.GetFileSize(utils.GetEnv("upload.maximum"))
+	maxStorageSize, err := u.GetFileSize(u.GetEnv("upload.maximum"))
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -58,7 +70,7 @@ func CreateUploadTask(c echo.Context) error {
 		totalSize += fileInfo.FileSize
 	}
 	if totalSize+r.FileSize > int64(maxStorageSize) {
-		return utils.HTTPErrorHandler(c, errors.New("存储空间不足"))
+		return utils.HTTPErrorHandler(c, ErrInsufficientStorage)
 	}
 
 	ChunkSize := int64(0.25 * 1024 * 1024)
@@ -66,7 +78,7 @@ func CreateUploadTask(c echo.Context) error {
 	for r.FileSize/ChunkSize > 1000 {
 		ChunkSize *= 2
 	}
-	uploadTaskExpire := int64(3600)
+	uploadTaskExpire := cast.ToInt64(u.GetEnvWithDefault("upload.remove_expire", "2")) * 3600
 	newFileInfo := models.RedisFileInfo{
 		FileType: models.FileTypeInit,
 		FileInfo: models.FileInfo{
@@ -83,14 +95,7 @@ func CreateUploadTask(c echo.Context) error {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	client := utils.GetQueueClient()
-	json, err := json.Marshal(map[string]any{
-		"file_id": fileId,
-	})
-	if err != nil {
-		return utils.HTTPErrorHandler(c, err)
-	}
-	_, err = client.Enqueue(asynq.NewTask("file:remove", json), asynq.ProcessIn(time.Duration(uploadTaskExpire)*time.Second))
+	err = s.SetFileRemoveTask(fileId, time.Duration(uploadTaskExpire)*time.Second)
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
@@ -112,14 +117,14 @@ type UploadFileSliceProps struct {
 	FileSlice *multipart.FileHeader `form:"file"`
 }
 
-func UploadFileSlice(c echo.Context) error {
+func UploadFileSlice(c *echo.Context) error {
 	r := new(UploadFileSliceProps)
 	if err := c.Bind(r); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
 	if r.FileId == "" || r.FileIndex == 0 || r.FileSlice == nil {
-		return utils.HTTPErrorHandler(c, errors.New("调用接口参数错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 	fileInfo, err := models.GetRedisFileInfo(r.FileId)
 	if err != nil {
@@ -128,18 +133,18 @@ func UploadFileSlice(c echo.Context) error {
 
 	now := time.Now().Unix()
 	if fileInfo.CreatedAt+fileInfo.Expire < now {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务已过期"))
+		return utils.HTTPErrorHandler(c, ErrUploadTaskExpired)
 	}
 
 	if fileInfo.FileType != models.FileTypeInit {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务状态错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidUploadTaskState)
 	}
 	if r.FileIndex > ((fileInfo.FileSize / fileInfo.ChunkSize) + 1) {
-		return utils.HTTPErrorHandler(c, errors.New("文件切片索引错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidFileSliceIndex)
 	}
 
 	if r.FileSlice.Size > fileInfo.ChunkSize {
-		return utils.HTTPErrorHandler(c, errors.New("文件切片大小错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidFileSliceSize)
 	}
 
 	// 打开文件
@@ -147,9 +152,14 @@ func UploadFileSlice(c echo.Context) error {
 	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
-	defer file.Close()
+	defer file.Close() //nolint:errcheck
 
-	if err := services.CreateFileSlice(file, r.FileId, r.FileIndex); err != nil {
+	uploadPath, err := u.GetUploadDirPath()
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
+
+	if _, err := services.CreateFileSlice(r.FileId, uploadPath, file, r.FileIndex); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
@@ -162,14 +172,14 @@ type FinishUploadTaskProps struct {
 	FileId string `json:"id"`
 }
 
-func FinishUploadTask(c echo.Context) error {
+func FinishUploadTask(c *echo.Context) error {
 	r := new(FinishUploadTaskProps)
 	if err := c.Bind(r); err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
 	if r.FileId == "" {
-		return utils.HTTPErrorHandler(c, errors.New("文件ID不能为空"))
+		return utils.HTTPErrorHandler(c, ErrInvalidRequest)
 	}
 
 	fileInfo, err := models.GetRedisFileInfo(r.FileId)
@@ -178,50 +188,57 @@ func FinishUploadTask(c echo.Context) error {
 	}
 
 	if fileInfo.FileType != models.FileTypeInit {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务状态错误"))
+		return utils.HTTPErrorHandler(c, ErrInvalidUploadTaskState)
 	}
 
 	now := time.Now().Unix()
 	if fileInfo.CreatedAt+fileInfo.Expire < now {
-		return utils.HTTPErrorHandler(c, errors.New("上传任务已过期"))
+		return utils.HTTPErrorHandler(c, ErrUploadTaskExpired)
 	}
 
-	// 合并文件切片
-	uploadPath, _ := utils.GetUploadDirPath()
-	slicesPath := filepath.Join(uploadPath, fmt.Sprintf("%s_%s", r.FileId, "tmp"))
+	uploadPath, err := u.GetUploadDirPath()
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
+
+	fileSliceList, err := services.GetFileSliceList(r.FileId, uploadPath)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
+
+	if len(fileSliceList) != int(math.Ceil(float64(fileInfo.FileSize)/float64(fileInfo.ChunkSize))) {
+		return utils.HTTPErrorHandler(c, ErrIncompleteFileSlices)
+	}
 
 	// 最终合并后的文件路径
-	mergeFilePath := filepath.Join(uploadPath, r.FileId)
-	if err := services.MergeFileSlices(slicesPath, mergeFilePath); err != nil {
+	mergeFilePath, err := services.MergeFileSlices(r.FileId, uploadPath)
+	if err != nil {
 		return utils.HTTPErrorHandler(c, err)
 	}
 
 	// 计算文件MD5
 	file, err := os.Open(mergeFilePath)
 	if err != nil {
-		file.Close()
-		os.Remove(mergeFilePath)
+		return utils.HTTPErrorHandler(c, err)
+	}
+	defer file.Close() //nolint:errcheck
+
+	file_hash, err := u.GetFileMd5(file)
+	if err != nil || file_hash != fileInfo.FileHash {
+		defer os.Remove(mergeFilePath) //nolint:errcheck
+		if err == nil {
+			return utils.HTTPErrorHandler(c, ErrFileMD5Mismatch)
+		}
 		return utils.HTTPErrorHandler(c, err)
 	}
 
-	file_hash, err := utils.GetFileMd5(file)
-
-	if err != nil {
-		file.Close()
-		os.Remove(mergeFilePath)
-		return utils.HTTPErrorHandler(c, err)
-	}
-
-	if file_hash != fileInfo.FileHash {
-		file.Close()
-		os.Remove(mergeFilePath)
-		return utils.HTTPErrorHandler(c, errors.New("文件MD5不一致"))
-	}
-	defer file.Close()
 	// 更新文件信息
-	models.SetRedisFileInfo(r.FileId, models.RedisFileInfo{
+	err = models.SetRedisFileInfo(r.FileId, models.RedisFileInfo{
 		FileType: models.FileTypeUpload,
 	})
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 	// 统计
 	currentDate := time.Now().Format("2006-01-02")
 	statData, _ := models.GetRedisStat(currentDate)
@@ -235,7 +252,10 @@ func FinishUploadTask(c echo.Context) error {
 	}
 	statData.FileSize += fileInfo.FileSize
 	statData.FileNum += 1
-	models.SetRedisStat(currentDate, *statData)
+	err = models.SetRedisStat(currentDate, *statData)
+	if err != nil {
+		return utils.HTTPErrorHandler(c, err)
+	}
 
 	return utils.HTTPSuccessHandler(c, map[string]any{
 		"size":      fileInfo.FileSize,

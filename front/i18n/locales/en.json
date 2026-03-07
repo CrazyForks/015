@@ -13,114 +13,173 @@
         "submit": "Submit",
         "backToHome": "Back to Home"
     },
-    "file": {
-        "uploadFile": "Upload File",
-        "uploadFilePlaceholder": "Drag and drop files or click to upload",
-        "addMore": "Add More",
-        "handleType": {
-            "file-share": "File Share",
-            "file-image-compress": "Image Compress"
-        }
-    },
-    "text": {
-        "uploadText": "Upload Text",
-        "uploadTextPlaceholder": "Share, translate, summarize, generate images, and ask large models with our text processor",
-        "handleType": {
-            "text-share": "Text Share"
-        }
-    },
-    "pickup": {
-        "title": "Enter Pickup Code",
-        "codeError": "Invalid pickup code",
-        "btn": "Pickup"
-    },
-    "fileshare": {
-        "title": "Share Options",
-        "downloadNums": "Download Count",
-        "expireTime": "Expire Time",
-        "or": "or",
-        "expireAfter": "expire",
-        "pickupCode": "Pickup Code",
-        "passwordProtection": "Password Protection",
-        "downloadNotify": "Download Notification",
-        "passwordPlaceholder": "Enter password",
-        "emailPlaceholder": "Enter email",
-        "downloadOptions": {
-            "1time": "1 download",
-            "2times": "2 downloads",
-            "3times": "3 downloads",
-            "5times": "5 downloads",
-            "10times": "10 downloads"
+    "page": {
+        "upload": {
+            "file": {
+                "uploadFile": "Upload File",
+                "uploadFilePlaceholder": "Drag and drop files or click to upload",
+                "addMore": "Add More",
+                "handleType": {
+                    "file-share": "File Share",
+                    "file-image-compress": "Image Compress",
+                    "file-image-convert": "Format Convert"
+                }
+            },
+            "text": {
+                "uploadText": "Upload Text",
+                "uploadTextPlaceholder": "Share, translate, summarize, generate images, and ask large models with our text processor",
+                "handleType": {
+                    "text-share": "Text Share"
+                }
+            },
+            "pickup": {
+                "title": "Enter Pickup Code",
+                "codeError": "Invalid pickup code",
+                "btn": "Pickup"
+            }
         },
-        "expireOptions": {
-            "5min": "5 minutes",
-            "1hour": "1 hour",
-            "1day": "1 day",
-            "3days": "3 days"
-        }
-    },
-    "textshare": {
-        "title": "Share Options",
-        "viewNums": "View Count",
-        "expireTime": "Expire Time",
-        "or": "or",
-        "expireAfter": "expire",
-        "pickupCode": "Pickup Code",
-        "passwordProtection": "Password Protection",
-        "readNotify": "Read Notification",
-        "passwordPlaceholder": "Enter password",
-        "emailPlaceholder": "Enter email",
-        "viewOptions": {
-            "1time": "1 view",
-            "2times": "2 views",
-            "3times": "3 views",
-            "5times": "5 views",
-            "10times": "10 views"
+        "shareOptions": {
+            "file": {
+                "title": "Share Options",
+                "downloadNums": "Download Count",
+                "expireTime": "Expire Time",
+                "or": "or",
+                "expireAfter": "expire",
+                "pickupCode": "Pickup Code",
+                "passwordProtection": "Password Protection",
+                "downloadNotify": "Download Notification",
+                "passwordPlaceholder": "Enter password",
+                "emailPlaceholder": "Enter email",
+                "downloadOptions": {
+                    "xdownload": "{0} downloads"
+                },
+                "expireOptions": {
+                    "5min": "5 minutes",
+                    "1hour": "1 hour",
+                    "1day": "1 day",
+                    "3days": "3 days"
+                }
+            },
+            "imageConvert": {
+                "title": "Image Convert",
+                "targetFormat": "Target Format"
+            },
+            "text": {
+                "title": "Share Options",
+                "viewNums": "View Count",
+                "expireTime": "Expire Time",
+                "or": "or",
+                "expireAfter": "expire",
+                "pickupCode": "Pickup Code",
+                "passwordProtection": "Password Protection",
+                "readNotify": "Read Notification",
+                "passwordPlaceholder": "Enter password",
+                "emailPlaceholder": "Enter email",
+                "viewOptions": {
+                    "xview": "{0} views"
+                },
+                "expireOptions": {
+                    "5min": "5 minutes",
+                    "1hour": "1 hour",
+                    "1day": "1 day",
+                    "3days": "3 days"
+                }
+            }
         },
-        "expireOptions": {
-            "5min": "5 minutes",
-            "1hour": "1 hour",
-            "1day": "1 day",
-            "3days": "3 days"
+        "progress": {
+            "file": {
+                "totalUploadProgress": "Total Upload Progress",
+                "fileList": "File List",
+                "fileName": "File Name",
+                "fileSize": "File Size",
+                "uploadSpeed": "Speed",
+                "progress": "Progress",
+                "uploadDetails": "Upload Details",
+                "chunk": "Chunk",
+                "completed": "Completed",
+                "discarded": "Discarded",
+                "pending": "Pending",
+                "chunkProgress": "Chunk Progress",
+                "chunkHeatmap": "Chunk Heatmap",
+                "heatmap": "Heatmap",
+                "progressBar": "Progress Bar",
+                "uploadError": "Upload Error",
+                "chunkUploadFailed": "Chunk {1} of file {0} failed after multiple attempts, we have terminated the file upload",
+                "chunkUploadRetry": "Chunk {1} of file {0} failed to upload, we will try again later",
+                "fileUploadFailed": "File {0} upload failed, please try again",
+                "uploadFailed": "Upload Failed",
+                "processing": {
+                    "hash": "Calculating Hash...",
+                    "create": "Initializing Upload...",
+                    "upload": "Uploading...",
+                    "finish": "Upload Finished"
+                },
+                "instantUploadSuccess": "File with same hash exists in cloud, instant upload successful",
+                "uploadFailedRetry": "Upload failed, please try again later",
+                "uploadSpeedInfo": {
+                    "title": "How is the upload speed calculated?",
+                    "desc": {
+                        "base": "The upload speed is estimated based on {chunkNum} * {chunkSize} uploaded in the current second, which may have some deviation from the actual upload speed, for reference only",
+                        "chunkNum": "Number of file chunks",
+                        "chunkSize": "Size of each file chunk"
+                    }
+                }
+            }
+        },
+        "result": {
+            "file": {
+                "title": "Upload Successful",
+                "fileList": "File List",
+                "info": "Info",
+                "downloadNums": "Download Count",
+                "expireTime": "Expire Time",
+                "pickupCode": "Pickup Code",
+                "link": "Link",
+                "copySuccess": "Copy Success"
+            },
+            "imageCompress": {
+                "title": "Image Compress",
+                "totalSize": "Total Size",
+                "task": "Task",
+                "retry": "Retry {0}/{1}",
+                "failed": "Failed"
+            },
+            "imageConvert": {
+                "title": "Image Convert",
+                "convert": "Convert",
+                "task": "Task",
+                "retry": "Retry {0}/{1}",
+                "failed": "Failed"
+            },
+            "text": {
+                "title": "Share Successful",
+                "info": "Info",
+                "viewNums": "View Count",
+                "expireTime": "Expire Time",
+                "pickupCode": "Pickup Code",
+                "link": "Link",
+                "content": "Content",
+                "copySuccess": "Copy Success"
+            }
+        },
+        "about": {
+            "powerBy": "Power by {0} as a open source temporary file sharing platform",
+            "file": "File",
+            "share": "Share",
+            "download": "Download",
+            "task": "Task",
+            "admin": "Site Admin",
+            "author": "Author",
+            "title": "About",
+            "about": "About",
+            "systemInfo": "System Info",
+            "systemVersion": "System Version",
+            "storage": "Storage",
+            "analysis": "Analysis",
+            "fileSize": "File Size",
+            "fileNum": "File Num",
+            "processed": "Processed",
+            "failed": "Failed"
         }
-    },
-    "fileshareresult": {
-        "title": "Upload Successful",
-        "fileList": "File List",
-        "info": "Info",
-        "downloadNums": "Download Count",
-        "expireTime": "Expire Time",
-        "pickupCode": "Pickup Code",
-        "link": "Link",
-        "copySuccess": "Copy Success"
-    },
-    "textshareresult": {
-        "title": "Share Successful",
-        "info": "Info",
-        "viewNums": "View Count",
-        "expireTime": "Expire Time",
-        "pickupCode": "Pickup Code",
-        "link": "Link",
-        "content": "Content",
-        "copySuccess": "Copy Success"
-    },
-    "about": {
-        "powerBy": "Power by {0} as a open source temporary file sharing platform",
-        "file": "File",
-        "share": "Share",
-        "download": "Download",
-        "task": "Task",
-        "admin": "Site Admin",
-        "author": "Author",
-        "title": "About",
-        "about": "About",
-        "systemInfo": "System Info",
-        "systemVersion": "System Version",
-        "storage": "Storage",
-        "analysis": "Analysis",
-        "fileSize": "File Size",
-        "fileNum": "File Num",
-        "processed": "Processed",
-        "failed": "Failed"
     }
 }

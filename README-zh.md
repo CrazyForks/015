@@ -70,6 +70,23 @@ docker compose up -d
 ```
 
 
+## 🚀 快速开始
+
+### Docker
+
+1. 下载文件
+    - config.example.yaml
+    - docker-compose.yml
+
+2. 把config.example.yaml配置完成后改为config.yaml
+
+
+3. 启动
+```bash
+docker compose up -d
+```
+
+
 ## 🏗️ 技术架构
 
 ### 前端技术栈

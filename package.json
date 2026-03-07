@@ -4,12 +4,23 @@
     "private": true,
     "description": "",
     "scripts": {
-        "dev": "npm-run-all -p dev:front dev:backend dev:worker",
+        "dev": "concurrently -n front,backend,worker -c blue,green,yellow 'pnpm:dev:front' 'pnpm:dev:backend' 'pnpm:dev:worker'",
         "dev:front": "cd front && pnpm run dev",
         "dev:backend": "cd backend && air",
         "dev:worker": "cd worker && air",
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "prepare": "husky"
+        "lint": "concurrently -n front,backend,worker -c blue,green,yellow 'pnpm:lint:front' 'pnpm:lint:backend' 'pnpm:lint:worker'",
+        "lint:front": "cd front && pnpm nuxt typecheck",
+        "lint:backend": "cd backend && golangci-lint run",
+        "lint:worker": "cd worker && golangci-lint run",
+        "test:backend": "cd backend && go test -v ./test/...",
+        "test:worker": "cd worker && go test -v ./test/...",
+        "test": "concurrently -n backend,worker -c green,yellow 'pnpm:test:backend' 'pnpm:test:worker'",
+        "prepare": "husky",
+        "up-deps": "concurrently -n backend,worker,models,utils -c green,yellow,blue,magenta 'pnpm:up-deps:backend' 'pnpm:up-deps:worker' 'pnpm:up-deps:models' 'pnpm:up-deps:utils'",
+        "up-deps:backend": "cd backend && go get -u",
+        "up-deps:worker": "cd worker && go get -u",
+        "up-deps:models": "cd pkg/models && go get -u",
+        "up-deps:utils": "cd pkg/utils && go get -u"
     },
     "workspaces": [
         "front"
@@ -27,10 +38,10 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
+        "concurrently": "^9.2.1",
         "husky": "^9.1.7",
         "lint-staged": "^15.5.2",
-        "npm-run-all": "^4.1.5",
-        "prettier": "^3.6.2"
+        "prettier": "^3.8.1"
     },
-    "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b"
+    "packageManager": "pnpm@10.30.3+sha512.c961d1e0a2d8e354ecaa5166b822516668b7f44cb5bd95122d590dd81922f606f5473b6d23ec4a5be05e7fcd18e8488d47d978bbe981872f1145d06e9a740017"
 }

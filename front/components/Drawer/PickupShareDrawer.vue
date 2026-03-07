@@ -18,7 +18,7 @@ const handleSubmit = async (form: FormContext<GenericObject, GenericObject>) => 
             }
         }>(`/api/share/pickup/${code}`)
         if (!data.data.share_id) {
-            toast.error(t('pickup.codeError'))
+            toast.error(t('page.upload.pickup.codeError'))
             form.resetForm()
             return
         }
@@ -29,7 +29,7 @@ const handleSubmit = async (form: FormContext<GenericObject, GenericObject>) => 
         })
         return
     } catch (error) {
-        toast.error(t('pickup.codeError'))
+        toast.error(t('page.upload.pickup.codeError'))
         form.resetForm()
     }
 }
@@ -38,7 +38,7 @@ const handleSubmit = async (form: FormContext<GenericObject, GenericObject>) => 
 <template>
     <VeeForm>
         <div class="flex flex-col gap-5">
-            <div class="text-xl font-bold">{{ t('pickup.title') }}</div>
+            <div class="text-xl font-bold">{{ t('page.upload.pickup.title') }}</div>
             <PinInputField
                 name="code"
                 :rules="

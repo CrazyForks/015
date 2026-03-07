@@ -52,14 +52,14 @@ const genUserAvatar = (email: string) => {
         <div class="flex flex-col gap-2 items-center">
             <div class="text-xl">{{ renderI18n(appConfig?.site_title ?? {}, 'en', locale) }}</div>
             <div class="text-sm opacity-75 text-center px-5">
-                <I18nT keypath="about.powerBy" tag="span">
+                <I18nT keypath="page.about.powerBy" tag="span">
                     <NuxtLink href="https://github.com/keven1024/015" target="_blank" class="text-primary hover:underline">015</NuxtLink>
                 </I18nT>
             </div>
         </div>
     </template>
 
-    <div class="font-semibold">{{ t('about.systemInfo') }}</div>
+    <div class="font-semibold">{{ t('page.about.systemInfo') }}</div>
     <template v-if="isLoading">
         <div class="flex flex-row gap-2">
             <Skeleton class="w-full h-20 rounded-xl" v-for="i in 2" :key="i" />
@@ -68,7 +68,7 @@ const genUserAvatar = (email: string) => {
     <template v-else>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
             <div class="rounded-xl bg-white/50 flex-1 flex flex-col p-3 gap-2">
-                <div class="opacity-75 text-xs">{{ t('about.admin') }}</div>
+                <div class="opacity-75 text-xs">{{ t('page.about.admin') }}</div>
                 <div
                     class="flex flex-row gap-2 items-center cursor-pointer"
                     @click="
@@ -98,7 +98,7 @@ const genUserAvatar = (email: string) => {
                 </div>
             </div>
             <div class="rounded-xl bg-white/50 flex-1 flex flex-col p-3 gap-2">
-                <div class="opacity-75 text-xs">{{ t('about.storage') }}</div>
+                <div class="opacity-75 text-xs">{{ t('page.about.storage') }}</div>
                 <div class="text-right flex flex-row items-baseline">
                     <span class="text-lg font-semibold">{{ getFileSize(data?.file?.current ?? 0) }}</span>
                     <span class="text-md opacity-75">/ {{ getFileSize(data?.file?.maximun ?? 0) }}</span>
@@ -115,7 +115,7 @@ const genUserAvatar = (email: string) => {
             <Accordion type="single" collapsible>
                 <AccordionItem value="about">
                     <AccordionTrigger>
-                        <span class="font-semibold">{{ t('about.about') }}</span>
+                        <span class="font-semibold">{{ t('page.about.about') }}</span>
                     </AccordionTrigger>
                     <AccordionContent>
                         <MarkdownRender class="max-w-full" :markdown="renderI18n(data?.content ?? {}, 'en', locale) ?? ''" />

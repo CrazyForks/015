@@ -3,7 +3,7 @@ package middleware
 import (
 	"github.com/gorilla/sessions"
 	"github.com/labstack/echo-contrib/session"
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 func SessionMiddleware() echo.MiddlewareFunc {

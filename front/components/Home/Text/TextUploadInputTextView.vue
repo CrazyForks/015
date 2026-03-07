@@ -21,13 +21,12 @@ const handleTextShare = ({ type, config }: { type: string; config: any }) => {
 }
 </script>
 <template>
-    <div class="gap-5 flex flex-col">
-        <div class="text-xl font-normal">{{ t('text.uploadText') }}</div>
+    <BaseCard class="gap-5 flex flex-col" :title="t('page.upload.text.uploadText')">
         <div class="relative">
             <MarkdownInputField
                 name="text"
-                :placeholder="t('text.uploadTextPlaceholder')"
-                class="max-h-[50vh] min-h-40 overflow-y-auto max-w-full [&>*]:pr-10 flex flex-col"
+                :placeholder="t('page.upload.text.uploadTextPlaceholder')"
+                class="max-h-[50vh] min-h-40 overflow-y-auto max-w-full *:pr-10 flex flex-col"
                 rules="required"
             />
             <Button
@@ -68,5 +67,5 @@ const handleTextShare = ({ type, config }: { type: string; config: any }) => {
             </FormButton>
             <PickupShareBtn />
         </div>
-    </div>
+    </BaseCard>
 </template>

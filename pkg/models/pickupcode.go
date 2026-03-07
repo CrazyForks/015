@@ -1,0 +1,28 @@
+package models
+
+import (
+	"fmt"
+	"time"
+
+	"pkg/utils"
+
+	"github.com/redis/go-redis/v9"
+)
+
+func GetRedisPickupData(pickupCode string) (string, error) {
+	rdb, ctx := utils.GetRedisClient()
+	ShareId, err := rdb.Get(ctx, fmt.Sprintf("015:pickupCode:%s", pickupCode)).Result()
+	if err == redis.Nil {
+		return "", nil
+	}
+	if err != nil {
+		return "", err
+	}
+	return ShareId, nil
+}
+
+func SetRedisPickupData(pickupCode string, shareId string) (bool, error) {
+	rdb, ctx := utils.GetRedisClient()
+	ok, err := rdb.SetNX(ctx, fmt.Sprintf("015:pickupCode:%s", pickupCode), shareId, time.Until(time.Now().Add(24*time.Hour))).Result()
+	return ok, err
+}
