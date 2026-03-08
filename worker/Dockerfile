@@ -11,9 +11,9 @@ COPY pkg/ ./pkg/
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && \
     go mod download
 # Build
-RUN CGO_ENABLED=0 GOOS=linux go build -o worker ./worker
+RUN CGO_ENABLED=0 GOOS=linux go build -o worker-bin ./worker
 
 FROM alpine:3
 RUN apk add --no-cache pngquant jpegoptim imagemagick
-COPY --from=builder /app/worker /bin/worker
+COPY --from=builder /app/worker-bin /bin/worker
 ENTRYPOINT ["/bin/worker"]
