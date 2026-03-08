@@ -23,7 +23,7 @@ COPY pkg/ ./pkg/
 RUN go env -w GO111MODULE=on && go env -w GOPROXY=https://goproxy.cn,direct && \
     go mod download
 # Build from workspace root so pkg/utils, pkg/models, pkg/services resolve
-RUN CGO_ENABLED=0 GOOS=linux go build -o backend ./backend
+RUN CGO_ENABLED=0 GOOS=linux go build -o backend-bin ./backend
 
 
 FROM front-base AS runner
@@ -38,7 +38,7 @@ RUN adduser --system --uid 1001 nuxtjs
 
 # Only `.output` folder is needed from the build stage
 COPY --from=front-builder --chown=nuxtjs:nodejs /app/.output/ ./
-COPY --from=backend-builder /app/backend /bin/backend
+COPY --from=backend-builder /app/backend-bin /bin/backend
 COPY 015.sh /app/015.sh
 
 # Change the port and host
